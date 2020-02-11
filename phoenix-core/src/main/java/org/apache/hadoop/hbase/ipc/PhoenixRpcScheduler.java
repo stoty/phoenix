@@ -20,6 +20,7 @@ package org.apache.hadoop.hbase.ipc;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.phoenix.compat.hbase.CompatPhoenixRpcScheduler;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.query.QueryServicesOptions;
 
@@ -29,14 +30,13 @@ import com.google.common.annotations.VisibleForTesting;
  * {@link RpcScheduler} that first checks to see if this is an index or metedata update before passing off the
  * call to the delegate {@link RpcScheduler}.
  */
-public class PhoenixRpcScheduler extends RpcScheduler {
+public class PhoenixRpcScheduler extends CompatPhoenixRpcScheduler {
 
     // copied from org.apache.hadoop.hbase.ipc.SimpleRpcScheduler in HBase 0.98.4
     private static final String CALL_QUEUE_HANDLER_FACTOR_CONF_KEY = "ipc.server.callqueue.handler.factor";
     private static final String CALLQUEUE_LENGTH_CONF_KEY = "ipc.server.max.callqueue.length";
     private static final int DEFAULT_MAX_CALLQUEUE_LENGTH_PER_HANDLER = 10;
 
-    private RpcScheduler delegate;
     private int indexPriority;
     private int metadataPriority;
     private RpcExecutor indexCallExecutor;
@@ -163,21 +163,6 @@ public class PhoenixRpcScheduler extends RpcScheduler {
     @Override
     public int getActiveScanRpcHandlerCount() {
         return delegate.getActiveScanRpcHandlerCount();
-    }
-
-    @Override
-    public int getActiveGeneralRpcHandlerCount() {
-        return delegate.getActiveGeneralRpcHandlerCount();
-    }
-
-    @Override
-    public int getActivePriorityRpcHandlerCount() {
-        return delegate.getActivePriorityRpcHandlerCount();
-    }
-
-    @Override
-    public int getActiveReplicationRpcHandlerCount() {
-        return delegate.getActiveReplicationRpcHandlerCount();
     }
 
 }

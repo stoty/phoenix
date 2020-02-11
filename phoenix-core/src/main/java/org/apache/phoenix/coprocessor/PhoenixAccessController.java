@@ -63,6 +63,7 @@ import org.apache.hadoop.hbase.security.access.TableAuthManager;
 import org.apache.hadoop.hbase.security.access.UserPermission;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher;
+import org.apache.phoenix.compat.hbase.CompatObserverContext;
 import org.apache.phoenix.coprocessor.PhoenixMetaDataCoprocessorHost.PhoenixMetaDataControllerEnvironment;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.query.QueryServicesOptions;
@@ -173,7 +174,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
                 htd.addFamily(new HColumnDescriptor(familyName));
             }
             for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
-                observer.preCreateTable(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), htd, null);
+                observer.preCreateTable(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), htd, null);
             }
         }
 
@@ -352,11 +353,11 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
 
         for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
             if (tableType != PTableType.VIEW) {
-                observer.preDeleteTable(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), physicalTableName);
+                observer.preDeleteTable(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), physicalTableName);
             }
             if (indexes != null) {
                 for (PTable index : indexes) {
-                    observer.preDeleteTable(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()),
+                    observer.preDeleteTable(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()),
                             TableName.valueOf(index.getPhysicalName().getBytes()));
                 }
             }
@@ -373,7 +374,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
         if (!accessCheckEnabled) { return; }
         for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
             if (tableType != PTableType.VIEW) {
-                observer.preModifyTable(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), physicalTableName,
+                observer.preModifyTable(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), physicalTableName,
                     new HTableDescriptor(physicalTableName));
             }
         }
@@ -387,7 +388,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
             throws IOException {
         if (!accessCheckEnabled) { return; }
         for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
-            observer.preListNamespaceDescriptors(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()),
+            observer.preListNamespaceDescriptors(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()),
                     Arrays.asList(NamespaceDescriptor.create(schemaName).build()));
         }
     }
@@ -397,7 +398,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
             throws IOException {
         if (!accessCheckEnabled) { return; }
         for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
-            observer.preCreateNamespace(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()),
+            observer.preCreateNamespace(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()),
                     NamespaceDescriptor.create(schemaName).build());
         }
     }
@@ -407,7 +408,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
             throws IOException {
         if (!accessCheckEnabled) { return; }
         for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
-            observer.preDeleteNamespace(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), schemaName);
+            observer.preDeleteNamespace(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), schemaName);
         }
     }
 
@@ -417,7 +418,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
             throws IOException {
         if (!accessCheckEnabled) { return; }
         for (BaseMasterAndRegionObserver observer : getAccessControllers()) {
-            observer.preModifyTable(new ObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), physicalTableName,
+            observer.preModifyTable(new CompatObserverContext<MasterCoprocessorEnvironment>(getActiveUser()), physicalTableName,
                     new HTableDescriptor(physicalTableName));
         }
         // Check for read access in case of rebuild

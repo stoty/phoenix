@@ -38,6 +38,7 @@ import org.apache.hadoop.hbase.regionserver.RegionCoprocessorHost;
 import org.apache.hadoop.hbase.regionserver.RegionServerServices;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.UserProvider;
+import org.apache.phoenix.compat.hbase.CompatObserverContext;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.query.QueryServicesOptions;
 import org.apache.phoenix.schema.PIndexState;
@@ -66,7 +67,7 @@ public class PhoenixMetaDataCoprocessorHost
         loadSystemCoprocessors(conf, PHOENIX_META_DATA_COPROCESSOR_CONF_KEY);
     }
 
-    private static abstract class CoprocessorOperation<T extends CoprocessorEnvironment> extends ObserverContext<T> {
+    private static abstract class CoprocessorOperation<T extends CoprocessorEnvironment> extends CompatObserverContext<T> {
         abstract void call(MetaDataEndpointObserver oserver, ObserverContext<T> ctx) throws IOException;
 
         public CoprocessorOperation(User user) {

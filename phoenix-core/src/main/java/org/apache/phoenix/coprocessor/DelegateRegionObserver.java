@@ -679,7 +679,7 @@ public class DelegateRegionObserver implements RegionObserver {
         return delegate.postInstantiateDeleteTracker(ctx, delTracker);
     }
 
-    @Override
+    //No @Override for backwards compatibility reasons
     public void preWALAppend(ObserverContext<RegionCoprocessorEnvironment> ctx, WALKey key,
             WALEdit edit) throws IOException {
     }
