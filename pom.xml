@@ -1203,7 +1203,6 @@
     <profile>
       <id>phoenix-hbase-compat-1.4.0</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
         <property>
           <name>hbase.profile</name>
           <value>1.4</value>
