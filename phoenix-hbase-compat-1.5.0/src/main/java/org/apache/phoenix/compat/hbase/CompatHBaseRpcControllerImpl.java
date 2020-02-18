@@ -17,13 +17,24 @@
  */
 package org.apache.phoenix.compat.hbase;
 
-import org.apache.hadoop.hbase.ipc.DelegatingHBaseRpcController;
+import java.util.List;
 
-//We need to copy the HBase implementation, because we need to have CompatHBaseRpcController
-//as ancestor, so we cannot simply subclass the HBase Delegating* class
-public class CompatDelegatingHBaseRpcController extends DelegatingHBaseRpcController implements CompatHBaseRpcController {
+import org.apache.hadoop.hbase.CellScannable;
+import org.apache.hadoop.hbase.CellScanner;
+import org.apache.hadoop.hbase.CellUtil;
+import org.apache.hadoop.hbase.ipc.HBaseRpcControllerImpl;
 
-    public CompatDelegatingHBaseRpcController(CompatHBaseRpcController delegate) {
-      super(delegate);
-    }
+public class CompatHBaseRpcControllerImpl extends HBaseRpcControllerImpl implements CompatHBaseRpcController {
+
+    public CompatHBaseRpcControllerImpl() {
+        super();
+      }
+
+      public CompatHBaseRpcControllerImpl(final CellScanner cellScanner) {
+        super(cellScanner);
+      }
+
+      public CompatHBaseRpcControllerImpl(final List<CellScannable> cellIterables) {
+        super(cellIterables);
+      }
 }

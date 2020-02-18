@@ -17,116 +17,13 @@
  */
 package org.apache.phoenix.compat.hbase;
 
-import java.io.IOException;
-
-import org.apache.hadoop.hbase.CellScanner;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.ipc.HBaseRpcController;
-
-import com.google.protobuf.RpcCallback;
+import org.apache.hadoop.hbase.ipc.DelegatingHBaseRpcController;
 
 //We need to copy the HBase implementation, because we need to have CompatHBaseRpcController
 //as ancestor, so we cannot simply subclass the HBase Delegating* class
-public class CompatDelegatingHBaseRpcController implements CompatHBaseRpcController {
-    private HBaseRpcController delegate;
+public class CompatDelegatingHBaseRpcController extends DelegatingHBaseRpcController implements CompatHBaseRpcController {
 
     public CompatDelegatingHBaseRpcController(CompatHBaseRpcController delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public CellScanner cellScanner() {
-      return delegate.cellScanner();
-    }
-
-    @Override
-    public void setCellScanner(final CellScanner cellScanner) {
-      delegate.setCellScanner(cellScanner);
-    }
-
-    @Override
-    public void setPriority(int priority) {
-      delegate.setPriority(priority);
-    }
-
-    @Override
-    public void setPriority(final TableName tn) {
-      delegate.setPriority(tn);
-    }
-
-    @Override
-    public int getPriority() {
-      return delegate.getPriority();
-    }
-
-    @Override
-    public int getCallTimeout() {
-        return delegate.getCallTimeout();
-    }
-
-    @Override
-    public void setCallTimeout(int callTimeout) {
-        delegate.setCallTimeout(callTimeout);
-    }
-
-    @Override
-    public boolean hasCallTimeout() {
-        return delegate.hasCallTimeout();
-    }
-
-    @Override
-    public void setFailed(IOException e) {
-        delegate.setFailed(e);
-    }
-
-    @Override
-    public IOException getFailed() {
-        return delegate.getFailed();
-    }
-
-    @Override
-    public void setDone(CellScanner cellScanner) {
-        delegate.setDone(cellScanner);
-    }
-
-    @Override
-    public void notifyOnCancel(RpcCallback<Object> callback) {
-        delegate.notifyOnCancel(callback);
-    }
-
-    @Override
-    public void notifyOnCancel(RpcCallback<Object> callback, CancellationCallback action)
-            throws IOException {
-        delegate.notifyOnCancel(callback, action);
-    }
-
-    @Override
-    public void reset() {
-        delegate.reset();
-    }
-
-    @Override
-    public boolean failed() {
-        return delegate.failed();
-    }
-
-    @Override
-    public String errorText() {
-        return delegate.errorText();
-    }
-
-    @Override
-    public void startCancel() {
-        delegate.startCancel();
-    }
-
-    @Override
-    public void setFailed(String reason) {
-        delegate.setFailed(reason);
-    }
-
-    @Override
-    public boolean isCanceled() {
-        return delegate.isCanceled();
+      super(delegate);
     }
 }
