@@ -131,12 +131,10 @@ public enum GlobalClientMetrics {
         metric.change(value);
     }
 
-    @VisibleForTesting
     public GlobalMetric getMetric() {
         return metric;
     }
 
-    @VisibleForTesting
     public MetricType getMetricType() {
         return metricType;
     }

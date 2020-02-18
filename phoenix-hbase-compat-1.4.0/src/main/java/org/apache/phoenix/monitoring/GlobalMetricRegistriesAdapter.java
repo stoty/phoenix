@@ -37,7 +37,6 @@ import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.apache.hadoop.metrics2.lib.Interns;
 import org.apache.hadoop.metrics2.lib.MutableHistogram;
 import org.apache.hadoop.metrics2.source.JvmMetrics;
-import org.apache.phoenix.query.QueryServicesOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,13 +60,13 @@ public class GlobalMetricRegistriesAdapter {
         return INSTANCE;
     }
 
-    public void registerMetricRegistry(MetricRegistry registry) {
+    public void registerMetricRegistry(MetricRegistry registry, String metricTag) {
         if (registry == null) {
             LOGGER.warn("Registry cannot be registered with Hadoop Metrics 2 since it is null.");
             return;
         }
 
-        HBaseMetrics2HadoopMetricsAdapter adapter = new HBaseMetrics2HadoopMetricsAdapter(registry);
+        HBaseMetrics2HadoopMetricsAdapter adapter = new HBaseMetrics2HadoopMetricsAdapter(registry, metricTag);
         adapter.registerToDefaultMetricsSystem();
     }
 
@@ -80,9 +79,9 @@ public class GlobalMetricRegistriesAdapter {
         private final MetricRegistry registry;
         private final String metricTag;
 
-        private HBaseMetrics2HadoopMetricsAdapter(MetricRegistry registry) {
+        private HBaseMetrics2HadoopMetricsAdapter(MetricRegistry registry, String tag) {
             this.registry = registry;
-            metricTag = QueryServicesOptions.withDefaults().getClientMetricTag();
+            this.metricTag = tag;
         }
 
         private void registerToDefaultMetricsSystem() {

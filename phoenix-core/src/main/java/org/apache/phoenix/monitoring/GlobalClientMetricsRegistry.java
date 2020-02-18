@@ -17,57 +17,33 @@
  */
 package org.apache.phoenix.monitoring;
 
-import org.apache.hadoop.hbase.metrics.Gauge;
-import org.apache.hadoop.hbase.metrics.MetricRegistries;
-import org.apache.hadoop.hbase.metrics.MetricRegistry;
-import org.apache.hadoop.hbase.metrics.MetricRegistryInfo;
+import org.apache.phoenix.query.QueryServicesOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GlobalClientMetricsRegistry {
+public class GlobalClientMetricsRegistry extends CompatGlobalClientMetricsRegistry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalClientMetrics.class);
 
-    static {
-        if (GlobalClientMetrics.isMetricsEnabled()) {
-            MetricRegistry metricRegistry = createMetricRegistry();
-            registerPhoenixMetricsToRegistry(metricRegistry);
-            GlobalMetricRegistriesAdapter.getInstance().registerMetricRegistry(metricRegistry);
-        }
-    }
-
-    private static void registerPhoenixMetricsToRegistry(MetricRegistry metricRegistry) {
-        for (GlobalClientMetrics globalMetric : GlobalClientMetrics.values()) {
-            metricRegistry.register(globalMetric.getMetricType().columnName(),
-                    new PhoenixGlobalMetricGauge(globalMetric.getMetric()));
-        }
-    }
-
-    private static MetricRegistry createMetricRegistry() {
-        LOGGER.info("Creating Metric Registry for Phoenix Global Metrics");
-        MetricRegistryInfo registryInfo = new MetricRegistryInfo("PHOENIX", "Phoenix Client Metrics",
-                "phoenix", "Phoenix,sub=CLIENT", true);
-        return MetricRegistries.global().create(registryInfo);
-    }
-
-    /**
-     * Class to convert Phoenix Metric objects into HBase Metric objects (Gauge)
-     */
-    private static class PhoenixGlobalMetricGauge implements Gauge<Long> {
-
-        private final GlobalMetric metric;
-
-        public PhoenixGlobalMetricGauge(GlobalMetric metric) {
-            this.metric = metric;
-        }
-
-        @Override
-        public Long getValue() {
-            return metric.getValue();
-        }
-    }
-
     public static void register() {
-        //Noop, just ensure that the class is loaded
+        if (GlobalClientMetrics.isMetricsEnabled()) {
+            createRegistry();
+            registerPhoenixMetricsToRegistry();
+            registerMetricsAdapter(QueryServicesOptions.withDefaults().getClientMetricTag());
+        }
     }
+
+    private static void registerPhoenixMetricsToRegistry() {
+        for (final GlobalClientMetrics globalMetric : GlobalClientMetrics.values()) {
+            final GlobalMetric innerMetric = globalMetric.getMetric();
+            registerMetricToRegistry(globalMetric.getMetricType().columnName(),
+                    new ValueProvider() {
+                        @Override
+                        public Long getValue() {
+                            return innerMetric.getValue();
+                        }
+            });
+        }
+    }
+
 }
