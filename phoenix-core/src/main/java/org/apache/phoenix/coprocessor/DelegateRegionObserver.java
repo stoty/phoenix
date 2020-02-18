@@ -61,15 +61,14 @@ import org.apache.hadoop.hbase.regionserver.wal.WALEdit;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.util.Pair;
 import org.apache.hadoop.hbase.wal.WALKey;
+import org.apache.phoenix.compat.hbase.CompatDelegateRegionObserver;
 
 import com.google.common.collect.ImmutableList;
 
-public class DelegateRegionObserver implements RegionObserver {
-
-    protected final RegionObserver delegate;
+public class DelegateRegionObserver extends CompatDelegateRegionObserver implements RegionObserver {
     
     public DelegateRegionObserver(RegionObserver delegate) {
-        this.delegate = delegate;
+        super(delegate);
     }
 
     @Override
@@ -676,7 +675,7 @@ public class DelegateRegionObserver implements RegionObserver {
     public DeleteTracker postInstantiateDeleteTracker(
             ObserverContext<RegionCoprocessorEnvironment> ctx, DeleteTracker delTracker)
             throws IOException {
-        return delegate.postInstantiateDeleteTracker(ctx, delTracker);
+        return   delegate.postInstantiateDeleteTracker(ctx, delTracker);
     }
 
     //No @Override for backwards compatibility reasons
@@ -684,32 +683,5 @@ public class DelegateRegionObserver implements RegionObserver {
             WALEdit edit) throws IOException {
     }
 
-    @Override
-    public InternalScanner preFlushScannerOpen(ObserverContext<RegionCoprocessorEnvironment> c,
-            Store store, KeyValueScanner memstoreScanner, InternalScanner s, long readPoint)
-            throws IOException {
-        return delegate.preFlushScannerOpen(c, store, memstoreScanner, s, readPoint);
-    }
-
-    @Override
-    public InternalScanner preCompactScannerOpen(ObserverContext<RegionCoprocessorEnvironment> c,
-            Store store, List<? extends KeyValueScanner> scanners, ScanType scanType,
-            long earliestPutTs, InternalScanner s, CompactionRequest request, long readPoint)
-            throws IOException {
-      return delegate.preCompactScannerOpen(c, store, scanners, scanType, earliestPutTs, s, request,
-          readPoint);
-    }
-
-    @Override
-    public void preCommitStoreFile(ObserverContext<RegionCoprocessorEnvironment> ctx, byte[] family,
-            List<Pair<Path, Path>> pairs) throws IOException {
-        delegate.preCommitStoreFile(ctx, family, pairs);
-    }
-
-    @Override
-    public void postCommitStoreFile(ObserverContext<RegionCoprocessorEnvironment> ctx,
-            byte[] family, Path srcPath, Path dstPath) throws IOException {
-        delegate.postCommitStoreFile(ctx, family, srcPath, dstPath);
-    }
 
 }
