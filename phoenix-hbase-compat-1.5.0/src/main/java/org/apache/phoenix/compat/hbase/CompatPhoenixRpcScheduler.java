@@ -12,10 +12,6 @@ package org.apache.phoenix.compat.hbase;
 
 import org.apache.hadoop.hbase.ipc.RpcScheduler;
 
-/**
- * {@link RpcScheduler} that first checks to see if this is an index or metedata update before
- * passing off the call to the delegate {@link RpcScheduler}.
- */
 public abstract class CompatPhoenixRpcScheduler extends RpcScheduler {
     protected RpcScheduler delegate;
 

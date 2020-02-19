@@ -24,6 +24,6 @@ public abstract class CompatRegionCoprocessorEnvironment implements RegionCoproc
 
     @Override
     public MetricRegistry getMetricRegistryForRegionServer() {
-      throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 }

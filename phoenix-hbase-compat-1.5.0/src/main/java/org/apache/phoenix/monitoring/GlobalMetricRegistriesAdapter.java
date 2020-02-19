@@ -41,8 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Contents mostly copied from GlobalMetricRegistriesAdapter class from hbase-hadoop2-compat
- * The adapter attaches HBase's MetricRegistry to Hadoop's DefaultMetricsSystem
+ * Contents mostly copied from GlobalMetricRegistriesAdapter class from hbase-hadoop2-compat The
+ * adapter attaches HBase's MetricRegistry to Hadoop's DefaultMetricsSystem 
  * Note: This DOES NOT handle dynamic attach/detach of registries
  */
 public class GlobalMetricRegistriesAdapter {
@@ -66,7 +66,8 @@ public class GlobalMetricRegistriesAdapter {
             return;
         }
 
-        HBaseMetrics2HadoopMetricsAdapter adapter = new HBaseMetrics2HadoopMetricsAdapter(registry, metricTag);
+        HBaseMetrics2HadoopMetricsAdapter adapter =
+                new HBaseMetrics2HadoopMetricsAdapter(registry, metricTag);
         adapter.registerToDefaultMetricsSystem();
     }
 
@@ -86,38 +87,42 @@ public class GlobalMetricRegistriesAdapter {
 
         private void registerToDefaultMetricsSystem() {
             MetricRegistryInfo info = registry.getMetricRegistryInfo();
-            LOGGER.info("Registering " + info.getMetricsJmxContext() +
-                    " " + info.getMetricsDescription() + " into DefaultMetricsSystem");
-            DefaultMetricsSystem.instance().register(info.getMetricsJmxContext(), info.getMetricsDescription(), this);
+            LOGGER.info("Registering " + info.getMetricsJmxContext() + " "
+                    + info.getMetricsDescription() + " into DefaultMetricsSystem");
+            DefaultMetricsSystem.instance().register(info.getMetricsJmxContext(),
+                info.getMetricsDescription(), this);
         }
 
         private void snapshotAllMetrics(MetricRegistry metricRegistry, MetricsCollector collector) {
             MetricRegistryInfo hbaseMetricRegistryInfo = metricRegistry.getMetricRegistryInfo();
-            MetricsInfo hadoopMetricsInfo = Interns.info(hbaseMetricRegistryInfo.getMetricsName(), hbaseMetricRegistryInfo.getMetricsDescription());
+            MetricsInfo hadoopMetricsInfo =
+                    Interns.info(hbaseMetricRegistryInfo.getMetricsName(),
+                        hbaseMetricRegistryInfo.getMetricsDescription());
             MetricsRecordBuilder builder = collector.addRecord(hadoopMetricsInfo);
             builder.setContext(hbaseMetricRegistryInfo.getMetricsContext());
             builder.tag(hadoopMetricsInfo, metricTag);
             this.snapshotAllMetrics(metricRegistry, builder);
         }
 
-        private void snapshotAllMetrics(MetricRegistry metricRegistry, MetricsRecordBuilder builder) {
+        private void snapshotAllMetrics(MetricRegistry metricRegistry,
+                MetricsRecordBuilder builder) {
             Map<String, Metric> metrics = metricRegistry.getMetrics();
             Iterator iterator = metrics.entrySet().iterator();
 
-            while(iterator.hasNext()) {
-                Entry<String, Metric> e = (Entry)iterator.next();
+            while (iterator.hasNext()) {
+                Entry<String, Metric> e = (Entry) iterator.next();
                 String name = StringUtils.capitalize(e.getKey());
                 Metric metric = e.getValue();
                 if (metric instanceof Gauge) {
-                    this.addGauge(name, (Gauge)metric, builder);
+                    this.addGauge(name, (Gauge) metric, builder);
                 } else if (metric instanceof Counter) {
-                    this.addCounter(name, (Counter)metric, builder);
+                    this.addCounter(name, (Counter) metric, builder);
                 } else if (metric instanceof Histogram) {
-                    this.addHistogram(name, (Histogram)metric, builder);
+                    this.addHistogram(name, (Histogram) metric, builder);
                 } else if (metric instanceof Meter) {
-                    this.addMeter(name, (Meter)metric, builder);
+                    this.addMeter(name, (Meter) metric, builder);
                 } else if (metric instanceof Timer) {
-                    this.addTimer(name, (Timer)metric, builder);
+                    this.addTimer(name, (Timer) metric, builder);
                 } else {
                     LOGGER.info("Ignoring unknown Metric class " + metric.getClass().getName());
                 }
@@ -128,13 +133,13 @@ public class GlobalMetricRegistriesAdapter {
             MetricsInfo info = Interns.info(name, "");
             Object o = gauge.getValue();
             if (o instanceof Integer) {
-                builder.addGauge(info, (Integer)o);
+                builder.addGauge(info, (Integer) o);
             } else if (o instanceof Long) {
-                builder.addGauge(info, (Long)o);
+                builder.addGauge(info, (Long) o);
             } else if (o instanceof Float) {
-                builder.addGauge(info, (Float)o);
+                builder.addGauge(info, (Float) o);
             } else if (o instanceof Double) {
-                builder.addGauge(info, (Double)o);
+                builder.addGauge(info, (Double) o);
             } else {
                 LOGGER.warn("Ignoring Gauge (" + name + ") with unhandled type: " + o.getClass());
             }

@@ -19,7 +19,8 @@ package org.apache.phoenix.compat.hbase;
 
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 
-public abstract class CompatDelegateRegionCoprocessorEnvironment implements RegionCoprocessorEnvironment{
+public abstract class CompatDelegateRegionCoprocessorEnvironment
+        implements RegionCoprocessorEnvironment {
 
     protected RegionCoprocessorEnvironment delegate;
 

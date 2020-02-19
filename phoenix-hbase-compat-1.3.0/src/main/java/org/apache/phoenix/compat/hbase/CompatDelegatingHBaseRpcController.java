@@ -21,37 +21,37 @@ import org.apache.hadoop.hbase.CellScanner;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.ipc.PayloadCarryingRpcController;
 
-//We need to copy the HBase implementation, because we need to have CompatHBaseRpcController
-//as ancestor, so we cannot simply subclass the HBase Delegating* class
-public class CompatDelegatingHBaseRpcController extends CompatHBaseRpcController {
+// We need to copy the HBase implementation, because we need to have CompatHBaseRpcController
+// as ancestor, so we cannot simply subclass the HBase Delegating* class
+public abstract class CompatDelegatingHBaseRpcController extends CompatHBaseRpcController {
     private PayloadCarryingRpcController delegate;
 
     public CompatDelegatingHBaseRpcController(CompatHBaseRpcController delegate) {
-      this.delegate = delegate;
+        this.delegate = delegate;
     }
 
     @Override
     public CellScanner cellScanner() {
-      return delegate.cellScanner();
+        return delegate.cellScanner();
     }
 
     @Override
     public void setCellScanner(final CellScanner cellScanner) {
-      delegate.setCellScanner(cellScanner);
+        delegate.setCellScanner(cellScanner);
     }
 
     @Override
     public void setPriority(int priority) {
-      delegate.setPriority(priority);
+        delegate.setPriority(priority);
     }
 
     @Override
     public void setPriority(final TableName tn) {
-      delegate.setPriority(tn);
+        delegate.setPriority(tn);
     }
 
     @Override
     public int getPriority() {
-      return delegate.getPriority();
+        return delegate.getPriority();
     }
 }

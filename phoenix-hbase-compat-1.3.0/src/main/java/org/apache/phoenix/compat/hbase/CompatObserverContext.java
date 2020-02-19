@@ -24,8 +24,8 @@ import org.apache.hadoop.hbase.security.User;
 public class CompatObserverContext<E extends CoprocessorEnvironment> extends ObserverContext {
 
     public CompatObserverContext(User caller) {
-        //We are silently dropping the argument, instead of not pre-computing it
-        //This has some performance impact, but I believe that it is negligible
+        // We are silently dropping the argument, instead of not pre-computing it
+        // This has some performance impact, but I believe that it is negligible
         super();
     }
 

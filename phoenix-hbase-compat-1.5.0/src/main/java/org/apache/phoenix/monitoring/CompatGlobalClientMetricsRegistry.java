@@ -25,19 +25,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CompatGlobalClientMetricsRegistry {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompatGlobalClientMetricsRegistry.class);
-    
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(CompatGlobalClientMetricsRegistry.class);
+
     protected static MetricRegistry metricRegistry;
 
     protected static void createRegistry() {
         LOGGER.info("Creating Metric Registry for Phoenix Global Metrics");
-        MetricRegistryInfo registryInfo = new MetricRegistryInfo("PHOENIX", "Phoenix Client Metrics",
-                "phoenix", "Phoenix,sub=CLIENT", true);
+        MetricRegistryInfo registryInfo =
+                new MetricRegistryInfo("PHOENIX", "Phoenix Client Metrics", "phoenix",
+                        "Phoenix,sub=CLIENT", true);
         metricRegistry = MetricRegistries.global().create(registryInfo);
     }
 
-    protected static void registerMetricToRegistry(final String name, final ValueProvider valueProvider) {
+    protected static void registerMetricToRegistry(final String name,
+            final ValueProvider valueProvider) {
         metricRegistry.register(name, new Gauge<Long>() {
             @Override
             public Long getValue() {
@@ -47,10 +50,11 @@ public class CompatGlobalClientMetricsRegistry {
     }
 
     protected static void registerMetricsAdapter(String metricTag) {
-        GlobalMetricRegistriesAdapter.getInstance().registerMetricRegistry(metricRegistry, metricTag);
+        GlobalMetricRegistriesAdapter.getInstance().registerMetricRegistry(metricRegistry,
+            metricTag);
     }
 
-    //Glue interface to break dependency on org.apache.hadoop.hbase.metrics.Gauge
+    // Glue interface to break dependency on org.apache.hadoop.hbase.metrics.Gauge
     protected interface ValueProvider {
         public Long getValue();
     }

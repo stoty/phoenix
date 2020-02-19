@@ -27,22 +27,22 @@ import org.apache.hadoop.hbase.ipc.RpcControllerFactory;
 public class CompatRpcControllerFactory extends RpcControllerFactory {
 
     public CompatRpcControllerFactory(Configuration conf) {
-      super(conf);
+        super(conf);
     }
 
     @Override
     public CompatHBaseRpcController newController() {
-      return new CompatHBaseRpcController();
+        return new CompatHBaseRpcController();
     }
 
     @Override
     public CompatHBaseRpcController newController(final CellScanner cellScanner) {
-      return new CompatHBaseRpcController(cellScanner);
+        return new CompatHBaseRpcController(cellScanner);
     }
 
     @Override
     public CompatHBaseRpcController newController(final List<CellScannable> cellIterables) {
-      return new CompatHBaseRpcController(cellIterables);
+        return new CompatHBaseRpcController(cellIterables);
     }
 
 }

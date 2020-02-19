@@ -24,12 +24,12 @@ import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 import org.apache.hadoop.hbase.metrics.MetricRegistry;
 
 public abstract class CompatPhoenixMetaDataControllerEnvironment extends CoprocessorHost.Environment
-implements RegionCoprocessorEnvironment {
+        implements RegionCoprocessorEnvironment {
 
     protected RegionCoprocessorEnvironment env;
 
-    public CompatPhoenixMetaDataControllerEnvironment(RegionCoprocessorEnvironment env, Coprocessor instance,
-            int priority, int sequence, Configuration conf) {
+    public CompatPhoenixMetaDataControllerEnvironment(RegionCoprocessorEnvironment env,
+            Coprocessor instance, int priority, int sequence, Configuration conf) {
         super(instance, priority, sequence, conf);
         this.env = env;
     }

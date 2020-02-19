@@ -18,5 +18,4 @@
 package org.apache.phoenix.compat.hbase;
 
 public abstract class CompatScanningResultIterator {
-
 }

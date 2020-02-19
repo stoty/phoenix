@@ -20,5 +20,4 @@ package org.apache.phoenix.compat.hbase;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 
 public abstract class CompatRegionCoprocessorEnvironment implements RegionCoprocessorEnvironment {
-
 }

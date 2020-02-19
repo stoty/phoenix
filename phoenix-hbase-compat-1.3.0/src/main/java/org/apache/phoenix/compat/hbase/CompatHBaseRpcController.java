@@ -26,14 +26,14 @@ import org.apache.hadoop.hbase.ipc.PayloadCarryingRpcController;
 public class CompatHBaseRpcController extends PayloadCarryingRpcController {
 
     public CompatHBaseRpcController() {
-        this((CellScanner)null);
-      }
+        this((CellScanner) null);
+    }
 
-      public CompatHBaseRpcController(final CellScanner cellScanner) {
+    public CompatHBaseRpcController(final CellScanner cellScanner) {
         super(cellScanner);
-      }
+    }
 
-      public CompatHBaseRpcController(final List<CellScannable> cellIterables) {
+    public CompatHBaseRpcController(final List<CellScannable> cellIterables) {
         super(cellIterables);
-      }
+    }
 }

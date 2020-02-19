@@ -24,25 +24,25 @@ import org.apache.hadoop.hbase.CellScannable;
 import org.apache.hadoop.hbase.CellScanner;
 import org.apache.hadoop.hbase.ipc.RpcControllerFactory;
 
-public class CompatRpcControllerFactory extends RpcControllerFactory {
+public abstract class CompatRpcControllerFactory extends RpcControllerFactory {
 
     public CompatRpcControllerFactory(Configuration conf) {
-      super(conf);
+        super(conf);
     }
 
     @Override
     public CompatHBaseRpcController newController() {
-      return new CompatHBaseRpcControllerImpl();
+        return new CompatHBaseRpcControllerImpl();
     }
 
     @Override
     public CompatHBaseRpcController newController(final CellScanner cellScanner) {
-      return new CompatHBaseRpcControllerImpl(cellScanner);
+        return new CompatHBaseRpcControllerImpl(cellScanner);
     }
 
     @Override
     public CompatHBaseRpcController newController(final List<CellScannable> cellIterables) {
-      return new CompatHBaseRpcControllerImpl(cellIterables);
+        return new CompatHBaseRpcControllerImpl(cellIterables);
     }
 
 }

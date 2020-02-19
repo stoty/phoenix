@@ -25,9 +25,9 @@ public class CompatUtil {
     public static Class[] getMrMetricsClasses() {
         return new Class[] {};
     }
-    
+
     public static Scan setStartRow(Scan scan, byte[] indexRowKey, boolean inclusive) {
-        if(inclusive) {
+        if (inclusive) {
             return scan.setStartRow(indexRowKey);
         } else {
             byte[] nextIndexRowKey = new byte[indexRowKey.length + 1];
@@ -38,7 +38,7 @@ public class CompatUtil {
     }
 
     public static Scan setStopRow(Scan scan, byte[] indexRowKey, boolean inclusive) {
-        if(inclusive) {
+        if (inclusive) {
             return scan.setStopRow(indexRowKey);
         } else {
             throw new NotImplementedException();

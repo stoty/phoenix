@@ -21,9 +21,9 @@ import org.apache.hadoop.hbase.io.hfile.HFileScanner;
 import org.apache.hadoop.hbase.regionserver.StoreFile.Reader;
 import org.apache.hadoop.hbase.regionserver.StoreFileScanner;
 
-//This has to be in org.apache.hadoop.hbase.regionserver due to the default
-//visibility of some methods
-public class CompatStoreFileScanner extends StoreFileScanner {
+// This has to be in org.apache.hadoop.hbase.regionserver due to the default
+// visibility of some methods
+public abstract class CompatStoreFileScanner extends StoreFileScanner {
 
     public CompatStoreFileScanner(Reader reader, HFileScanner hfs, boolean useMVCC, boolean hasMVCC,
             long readPt, long scannerOrder, boolean canOptimizeForNonNullColumn) {

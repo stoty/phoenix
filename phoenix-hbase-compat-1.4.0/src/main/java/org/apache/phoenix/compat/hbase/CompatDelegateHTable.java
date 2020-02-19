@@ -25,24 +25,24 @@ public abstract class CompatDelegateHTable implements Table {
     public CompatDelegateHTable(Table delegate) {
         this.delegate = delegate;
     }
-    
+
     @Override
     public int getReadRpcTimeout() {
-      return delegate.getReadRpcTimeout();
+        return delegate.getReadRpcTimeout();
     }
 
     @Override
     public void setReadRpcTimeout(int readRpcTimeout) {
-      delegate.setReadRpcTimeout(readRpcTimeout);
+        delegate.setReadRpcTimeout(readRpcTimeout);
     }
 
     @Override
     public int getWriteRpcTimeout() {
-      return delegate.getWriteRpcTimeout();
+        return delegate.getWriteRpcTimeout();
     }
 
     @Override
     public void setWriteRpcTimeout(int writeRpcTimeout) {
-      delegate.setWriteRpcTimeout(writeRpcTimeout);
+        delegate.setWriteRpcTimeout(writeRpcTimeout);
     }
 }

@@ -20,5 +20,4 @@ package org.apache.phoenix.compat.hbase;
 import org.apache.hadoop.hbase.ipc.HBaseRpcController;
 
 public interface CompatHBaseRpcController extends HBaseRpcController {
-
 }

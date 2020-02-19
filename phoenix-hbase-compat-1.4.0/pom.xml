@@ -15,12 +15,12 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation=
-    "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+      "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-    <parent>
+  <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
     <version>21</version>
@@ -29,7 +29,7 @@
   <artifactId>phoenix-hbase-compat-1.4.0</artifactId>
   <version>4.16.0-SNAPSHOT</version>
   <name>Phoenix Hbase 1.4.0 compatibility</name>
-  <description>Compatibility module for HBase 1.4.0+ </description>
+  <description>Compatibility module for HBase 1.4.0+</description>
 
   <build>
     <plugins>
@@ -52,25 +52,24 @@
   </build>
 
   <dependencies>
-       <!-- HBase dependencies -->
-      <dependency>
-        <groupId>org.apache.hbase</groupId>
-        <artifactId>hbase-server</artifactId>
-        <version>1.4.0</version>
-        <scope>provided</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-server</artifactId>
+      <version>1.4.0</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <reporting>
-      <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-          </plugin>
-          <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>findbugs-maven-plugin</artifactId>
-          </plugin>
-      </plugins>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
   </reporting>
 </project>

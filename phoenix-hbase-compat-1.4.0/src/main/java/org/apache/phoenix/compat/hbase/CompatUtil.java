@@ -21,15 +21,15 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.metrics.Gauge;
 import org.apache.hadoop.hbase.metrics.impl.MetricRegistriesImpl;
 
-public class CompatUtil {
+public abstract class CompatUtil {
     public static Class[] getMrMetricsClasses() {
-        return new Class[] {Gauge.class, MetricRegistriesImpl.class};
+        return new Class[] { Gauge.class, MetricRegistriesImpl.class };
     }
-    
+
     public static Scan setStartRow(Scan scan, byte[] indexRowKey, boolean inclusive) {
         return scan.withStartRow(indexRowKey, inclusive);
     }
-    
+
     public static Scan setStopRow(Scan scan, byte[] indexRowKey, boolean inclusive) {
         return scan.withStopRow(indexRowKey, inclusive);
     }

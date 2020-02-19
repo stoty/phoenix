@@ -19,11 +19,12 @@ package org.apache.phoenix.compat.hbase;
 
 import org.apache.hadoop.hbase.ipc.DelegatingHBaseRpcController;
 
-//We need to copy the HBase implementation, because we need to have CompatHBaseRpcController
-//as ancestor, so we cannot simply subclass the HBase Delegating* class
-public class CompatDelegatingHBaseRpcController extends DelegatingHBaseRpcController implements CompatHBaseRpcController {
+// We need to copy the HBase implementation, because we need to have CompatHBaseRpcController
+// as ancestor, so we cannot simply subclass the HBase Delegating* class
+public abstract class CompatDelegatingHBaseRpcController extends DelegatingHBaseRpcController
+        implements CompatHBaseRpcController {
 
     public CompatDelegatingHBaseRpcController(CompatHBaseRpcController delegate) {
-      super(delegate);
+        super(delegate);
     }
 }

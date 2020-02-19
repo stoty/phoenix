@@ -17,23 +17,22 @@
  */
 package org.apache.phoenix.monitoring;
 
-
 public class CompatGlobalClientMetricsRegistry {
 
-
     protected static void createRegistry() {
-        //NOOP
+        // NOOP
     }
 
-    protected static void registerMetricToRegistry(final String name, final ValueProvider valueProvider) {
-        //NOOP
+    protected static void registerMetricToRegistry(final String name,
+            final ValueProvider valueProvider) {
+        // NOOP
     }
 
     protected static void registerMetricsAdapter(String metricTag) {
-        //NOOP
+        // NOOP
     }
 
-    //Glue interface to break dependency on org.apache.hadoop.hbase.metrics.Gauge
+    // Glue interface to break dependency on org.apache.hadoop.hbase.metrics.Gauge
     protected interface ValueProvider {
         public Long getValue();
     }

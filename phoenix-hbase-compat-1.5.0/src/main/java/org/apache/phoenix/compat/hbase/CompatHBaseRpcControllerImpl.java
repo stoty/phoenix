@@ -24,17 +24,18 @@ import org.apache.hadoop.hbase.CellScanner;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.ipc.HBaseRpcControllerImpl;
 
-public class CompatHBaseRpcControllerImpl extends HBaseRpcControllerImpl implements CompatHBaseRpcController {
+public class CompatHBaseRpcControllerImpl extends HBaseRpcControllerImpl
+        implements CompatHBaseRpcController {
 
     public CompatHBaseRpcControllerImpl() {
         super();
-      }
+    }
 
-      public CompatHBaseRpcControllerImpl(final CellScanner cellScanner) {
+    public CompatHBaseRpcControllerImpl(final CellScanner cellScanner) {
         super(cellScanner);
-      }
+    }
 
-      public CompatHBaseRpcControllerImpl(final List<CellScannable> cellIterables) {
+    public CompatHBaseRpcControllerImpl(final List<CellScannable> cellIterables) {
         super(cellIterables);
-      }
+    }
 }

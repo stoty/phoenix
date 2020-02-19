@@ -20,7 +20,8 @@ package org.apache.phoenix.compat.hbase;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 import org.apache.hadoop.hbase.metrics.MetricRegistry;
 
-public abstract class CompatDelegateRegionCoprocessorEnvironment implements RegionCoprocessorEnvironment{
+public abstract class CompatDelegateRegionCoprocessorEnvironment
+        implements RegionCoprocessorEnvironment {
 
     protected RegionCoprocessorEnvironment delegate;
 

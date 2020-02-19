@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.phoenix.compat.hbase;
 
 import java.io.IOException;
@@ -39,7 +38,6 @@ public abstract class CompatDelegateRegionObserver implements RegionObserver {
     public CompatDelegateRegionObserver(RegionObserver delegate) {
         this.delegate = delegate;
     }
-    
 
     @Override
     public InternalScanner preFlushScannerOpen(ObserverContext<RegionCoprocessorEnvironment> c,
@@ -53,8 +51,8 @@ public abstract class CompatDelegateRegionObserver implements RegionObserver {
             Store store, List<? extends KeyValueScanner> scanners, ScanType scanType,
             long earliestPutTs, InternalScanner s, CompactionRequest request, long readPoint)
             throws IOException {
-      return delegate.preCompactScannerOpen(c, store, scanners, scanType, earliestPutTs, s, request,
-          readPoint);
+        return delegate.preCompactScannerOpen(c, store, scanners, scanType, earliestPutTs, s,
+            request, readPoint);
     }
 
     @Override
