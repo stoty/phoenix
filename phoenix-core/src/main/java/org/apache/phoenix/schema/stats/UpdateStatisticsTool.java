@@ -214,11 +214,13 @@ public class UpdateStatisticsTool extends Configured implements Tool {
         job.setPriority(this.jobPriority);
 
         TableMapReduceUtil.addDependencyJars(job);
-        TableMapReduceUtil.addDependencyJarsForClasses(job.getConfiguration(), PhoenixConnection.class, Chronology.class,
-                CharStream.class, TransactionSystemClient.class, TransactionNotInProgressException.class,
-                ZKClient.class, DiscoveryServiceClient.class, ZKDiscoveryService.class,
-                Cancellable.class, TTransportException.class, SpanReceiver.class, TransactionProcessor.class);
-        TableMapReduceUtil.addDependencyJarsForClasses(job.getConfiguration(), CompatUtil.getMrMetricsClasses());
+        TableMapReduceUtil.addDependencyJarsForClasses(job.getConfiguration(),
+            PhoenixConnection.class, Chronology.class, CharStream.class,
+            TransactionSystemClient.class, TransactionNotInProgressException.class, ZKClient.class,
+            DiscoveryServiceClient.class, ZKDiscoveryService.class, Cancellable.class,
+            TTransportException.class, SpanReceiver.class, TransactionProcessor.class);
+        TableMapReduceUtil.addDependencyJarsForClasses(job.getConfiguration(),
+            CompatUtil.getMrMetricsClasses());
         LOGGER.info("UpdateStatisticsTool running for: " + tableName
                 + " on snapshot: " + snapshotName + " with restore dir: " + restoreDir);
     }

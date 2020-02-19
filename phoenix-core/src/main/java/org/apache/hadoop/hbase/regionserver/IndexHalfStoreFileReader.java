@@ -135,7 +135,7 @@ public class IndexHalfStoreFileReader extends StoreFile.Reader {
     // The @Override is missing, since we do not know which version will be active at compile time
 
     //The 1.4+ version
-    public StoreFileScanner getStoreFileScanner(boolean cacheBlocks, boolean pread, 
+    public StoreFileScanner getStoreFileScanner(boolean cacheBlocks, boolean pread,
             boolean isCompaction, long readPt,
             long scannerOrder, boolean canOptimizeForNonNullColumn) {
         return new LocalIndexStoreFileScanner(this, getScanner(cacheBlocks, pread, isCompaction),

@@ -37,12 +37,12 @@ public class GlobalClientMetricsRegistry extends CompatGlobalClientMetricsRegist
         for (final GlobalClientMetrics globalMetric : GlobalClientMetrics.values()) {
             final GlobalMetric innerMetric = globalMetric.getMetric();
             registerMetricToRegistry(globalMetric.getMetricType().columnName(),
-                    new ValueProvider() {
-                        @Override
-                        public Long getValue() {
-                            return innerMetric.getValue();
-                        }
-            });
+                new ValueProvider() {
+                    @Override
+                    public Long getValue() {
+                        return innerMetric.getValue();
+                    }
+                });
         }
     }
 

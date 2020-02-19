@@ -67,7 +67,8 @@ public class PhoenixMetaDataCoprocessorHost
         loadSystemCoprocessors(conf, PHOENIX_META_DATA_COPROCESSOR_CONF_KEY);
     }
 
-    private static abstract class CoprocessorOperation<T extends CoprocessorEnvironment> extends CompatObserverContext<T> {
+    private static abstract class CoprocessorOperation<T extends CoprocessorEnvironment>
+            extends CompatObserverContext<T> {
         abstract void call(MetaDataEndpointObserver oserver, ObserverContext<T> ctx) throws IOException;
 
         public CoprocessorOperation(User user) {
