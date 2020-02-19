@@ -17,14 +17,13 @@
  */
 package org.apache.phoenix.compat.hbase;
 
-import org.apache.hadoop.hbase.CoprocessorEnvironment;
-import org.apache.hadoop.hbase.coprocessor.ObserverContext;
-import org.apache.hadoop.hbase.security.User;
+import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
+import org.apache.hadoop.hbase.metrics.MetricRegistry;
 
-public class CompatObserverContext<E extends CoprocessorEnvironment> extends ObserverContext {
+public abstract class CompatRegionCoprocessorEnvironment implements RegionCoprocessorEnvironment {
 
-    public CompatObserverContext(User caller) {
-        super();
+    @Override
+    public MetricRegistry getMetricRegistryForRegionServer() {
+      throw new UnsupportedOperationException();
     }
-
 }

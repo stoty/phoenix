@@ -32,13 +32,13 @@ import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.coprocessor.ObserverContext;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 import org.apache.hadoop.hbase.ipc.RpcServer;
-import org.apache.hadoop.hbase.metrics.MetricRegistry;
 import org.apache.hadoop.hbase.regionserver.Region;
 import org.apache.hadoop.hbase.regionserver.RegionCoprocessorHost;
 import org.apache.hadoop.hbase.regionserver.RegionServerServices;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.UserProvider;
 import org.apache.phoenix.compat.hbase.CompatObserverContext;
+import org.apache.phoenix.compat.hbase.CompatPhoenixMetaDataControllerEnvironment;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.query.QueryServicesOptions;
 import org.apache.phoenix.schema.PIndexState;
@@ -116,15 +116,13 @@ public class PhoenixMetaDataCoprocessorHost
     /**
      * Encapsulation of the environment of each coprocessor
      */
-    public static class PhoenixMetaDataControllerEnvironment extends CoprocessorHost.Environment
+    public static class PhoenixMetaDataControllerEnvironment 
+            extends CompatPhoenixMetaDataControllerEnvironment
             implements RegionCoprocessorEnvironment {
-
-        private RegionCoprocessorEnvironment env;
 
         PhoenixMetaDataControllerEnvironment(RegionCoprocessorEnvironment env, Coprocessor instance,
                 int priority, int sequence, Configuration conf) {
-            super(instance, priority, sequence, conf);
-            this.env = env;
+            super(env, instance, priority, sequence, conf);
         }
 
         @Override
@@ -151,10 +149,6 @@ public class PhoenixMetaDataCoprocessorHost
             return env.getSharedData();
         }
 
-        @Override
-        public MetricRegistry getMetricRegistryForRegionServer() {
-            return env.getMetricRegistryForRegionServer();
-        }
     }
 
     @Override

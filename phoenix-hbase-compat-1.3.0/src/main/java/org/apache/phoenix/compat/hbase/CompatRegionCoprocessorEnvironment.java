@@ -17,14 +17,8 @@
  */
 package org.apache.phoenix.compat.hbase;
 
-import org.apache.hadoop.hbase.CoprocessorEnvironment;
-import org.apache.hadoop.hbase.coprocessor.ObserverContext;
-import org.apache.hadoop.hbase.security.User;
+import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 
-public class CompatObserverContext<E extends CoprocessorEnvironment> extends ObserverContext {
-
-    public CompatObserverContext(User caller) {
-        super();
-    }
+public abstract class CompatRegionCoprocessorEnvironment implements RegionCoprocessorEnvironment {
 
 }

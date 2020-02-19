@@ -17,14 +17,25 @@
  */
 package org.apache.phoenix.compat.hbase;
 
-import org.apache.hadoop.hbase.CoprocessorEnvironment;
-import org.apache.hadoop.hbase.coprocessor.ObserverContext;
-import org.apache.hadoop.hbase.security.User;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.Coprocessor;
+import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
+import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
+import org.apache.hadoop.hbase.metrics.MetricRegistry;
 
-public class CompatObserverContext<E extends CoprocessorEnvironment> extends ObserverContext {
+public abstract class CompatPhoenixMetaDataControllerEnvironment extends CoprocessorHost.Environment
+implements RegionCoprocessorEnvironment {
 
-    public CompatObserverContext(User caller) {
-        super();
+    protected RegionCoprocessorEnvironment env;
+
+    public CompatPhoenixMetaDataControllerEnvironment(RegionCoprocessorEnvironment env, Coprocessor instance,
+            int priority, int sequence, Configuration conf) {
+        super(instance, priority, sequence, conf);
+        this.env = env;
     }
 
+    @Override
+    public MetricRegistry getMetricRegistryForRegionServer() {
+        return env.getMetricRegistryForRegionServer();
+    }
 }

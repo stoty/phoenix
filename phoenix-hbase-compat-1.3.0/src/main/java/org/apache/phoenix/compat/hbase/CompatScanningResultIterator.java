@@ -17,14 +17,6 @@
  */
 package org.apache.phoenix.compat.hbase;
 
-import org.apache.hadoop.hbase.CoprocessorEnvironment;
-import org.apache.hadoop.hbase.coprocessor.ObserverContext;
-import org.apache.hadoop.hbase.security.User;
-
-public class CompatObserverContext<E extends CoprocessorEnvironment> extends ObserverContext {
-
-    public CompatObserverContext(User caller) {
-        super();
-    }
+public abstract class CompatScanningResultIterator {
 
 }

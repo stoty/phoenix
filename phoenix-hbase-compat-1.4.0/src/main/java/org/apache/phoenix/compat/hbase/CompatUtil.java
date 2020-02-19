@@ -34,4 +34,3 @@ public class CompatUtil {
         return scan.withStopRow(indexRowKey, inclusive);
     }
 }
-
