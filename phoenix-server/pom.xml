@@ -299,7 +299,6 @@
   </build>
 
   <dependencies>
-    <!-- Depend on all other internal projects -->
     <dependency>
       <groupId>org.apache.phoenix</groupId>
       <artifactId>phoenix-core</artifactId>
