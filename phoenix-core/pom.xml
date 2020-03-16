@@ -223,14 +223,10 @@
       <artifactId>tephra-hbase-compat-2.0</artifactId>
     </dependency>
 
-    <!-- Make sure we have all the antlr dependencies -->
+    <!-- Only the antlr-runtime dependency is needed -->
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr-runtime</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>sqlline</groupId>
-      <artifactId>sqlline</artifactId>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.argparse4j</groupId>
