@@ -17,7 +17,8 @@
  */
 package org.apache.phoenix.end2end.index;
 
-import jline.internal.Log;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.regionserver.HRegion;
@@ -56,6 +57,8 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 @Category(NeedsOwnMiniClusterTest.class)
 public class MutableIndexExtendedIT extends ParallelStatsDisabledIT {
+    
+    private static final Log LOG = LogFactory.getLog(MutableIndexExtendedIT.class);
 
     protected final boolean localIndex;
     protected final String tableDDLOptions;
@@ -241,20 +244,20 @@ public class MutableIndexExtendedIT extends ParallelStatsDisabledIT {
                 }
                 if (!merged) {
                     List<RegionInfo> regions = admin.getRegions(indexTable);
-                    Log.info("Merging: " + regions.size());
+                    LOG.info("Merging: " + regions.size());
                     admin.mergeRegionsAsync(regions.get(0).getEncodedNameAsBytes(),
                             regions.get(1).getEncodedNameAsBytes(), false);
                     merged = true;
                     Threads.sleep(10000);
                 }
             } catch (Exception ex) {
-                Log.info(ex);
+                LOG.info(ex);
             }
             long waitStartTime = System.currentTimeMillis();
             // wait until merge happened
             while (System.currentTimeMillis() - waitStartTime < 10000) {
                 List<RegionInfo> regions = admin.getRegions(indexTable);
-                Log.info("Waiting:" + regions.size());
+                LOG.info("Waiting:" + regions.size());
                 if (regions.size() < numRegions) {
                     break;
                 }
