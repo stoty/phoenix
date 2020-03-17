@@ -631,10 +631,15 @@
         <artifactId>hadoop-mapreduce-client-core</artifactId>
         <version>${hadoop.version}</version>
       </dependency>
-      <!-- This is only referenced indirectly -->
+      <!-- These are referenced indirectly -->
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-client</artifactId>
+        <version>${hadoop.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-distcp</artifactId>
         <version>${hadoop.version}</version>
       </dependency>
       
@@ -664,6 +669,12 @@
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-mapreduce-client-app</artifactId>
+        <version>${hadoop.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
         <version>${hadoop.version}</version>
         <scope>test</scope>
       </dependency>
@@ -745,7 +756,7 @@
           </exclusion>
         </exclusions>
       </dependency>
- 
+
       <!-- Transaction dependencies -->
       <!-- Tephra -->
       <dependency>
