@@ -631,14 +631,20 @@
         <artifactId>hadoop-mapreduce-client-core</artifactId>
         <version>${hadoop.version}</version>
       </dependency>
+      <!-- This is only referenced indirectly -->
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-client</artifactId>
+        <version>${hadoop.version}</version>
+      </dependency>
       
       <!-- Hadoop test Dependencies -->
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-minicluster</artifactId>
         <version>${hadoop.version}</version>
-        <optional>true</optional>
         <scope>test</scope>
+        <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
@@ -646,7 +652,22 @@
         <version>${hadoop.version}</version>
         <scope>test</scope>
       </dependency>
-      
+      <!-- These are to fix Hadoop minicluster dependency issues -->
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-hdfs</artifactId>
+        <version>${hadoop.version}</version>
+        <type>test-jar</type>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-mapreduce-client-app</artifactId>
+        <version>${hadoop.version}</version>
+        <scope>test</scope>
+      </dependency>
+
       <!-- HBase dependencies -->
       <dependency>
         <groupId>org.apache.hbase</groupId>
@@ -1044,6 +1065,14 @@
         <version>${curator.version}</version>
       </dependency>
       
+      <!-- Fix omid dependency scopes -->
+      <dependency>
+        <groupId>org.apache.hbase</groupId>
+        <artifactId>hbase-testing-util</artifactId>
+        <version>${hbase.version}</version>
+        <scope>test</scope>
+      </dependency>
+
       <!-- Pherf dependencies -->
       <dependency>
         <groupId>com.googlecode.java-diff-utils</groupId>
