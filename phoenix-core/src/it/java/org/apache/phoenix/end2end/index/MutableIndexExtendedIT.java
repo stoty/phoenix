@@ -17,8 +17,6 @@
  */
 package org.apache.phoenix.end2end.index;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.regionserver.HRegion;
@@ -43,6 +41,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.sql.Connection;
@@ -58,7 +58,7 @@ import static org.junit.Assert.*;
 @Category(NeedsOwnMiniClusterTest.class)
 public class MutableIndexExtendedIT extends ParallelStatsDisabledIT {
     
-    private static final Log LOG = LogFactory.getLog(MutableIndexExtendedIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MutableIndexExtendedIT.class);
 
     protected final boolean localIndex;
     protected final String tableDDLOptions;
@@ -251,7 +251,7 @@ public class MutableIndexExtendedIT extends ParallelStatsDisabledIT {
                     Threads.sleep(10000);
                 }
             } catch (Exception ex) {
-                LOG.info(ex);
+                LOG.info("error:", ex);
             }
             long waitStartTime = System.currentTimeMillis();
             // wait until merge happened
