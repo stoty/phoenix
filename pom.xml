@@ -361,24 +361,24 @@
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
           <configuration>
-                <ignoredUnusedDeclaredDependencies>
-                  <ignoredUnusedDeclaredDependency>
-                    org.apache.omid:omid-hbase-shims-hbase2.x
-                  </ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>
-                    org.apache.omid:omid-hbase-common-hbase2.x:jar
-                  </ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>
-                    org.apache.omid:omid-hbase-commit-table-hbase2.x
-                  </ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>
-                    org.apache.omid:omid-timestamp-storage-hbase2.x
-                  </ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>
-                    org.slf4j:slf4j-log4j12
-                  </ignoredUnusedDeclaredDependency>
-                </ignoredUnusedDeclaredDependencies>
-              </configuration>
+              <ignoredUnusedDeclaredDependencies>
+                <ignoredUnusedDeclaredDependency>
+                  org.apache.omid:omid-hbase-shims-hbase2.x
+                </ignoredUnusedDeclaredDependency>
+                <ignoredUnusedDeclaredDependency>
+                  org.apache.omid:omid-hbase-common-hbase2.x:jar
+                </ignoredUnusedDeclaredDependency>
+                <ignoredUnusedDeclaredDependency>
+                  org.apache.omid:omid-hbase-commit-table-hbase2.x
+                </ignoredUnusedDeclaredDependency>
+                <ignoredUnusedDeclaredDependency>
+                  org.apache.omid:omid-timestamp-storage-hbase2.x
+                </ignoredUnusedDeclaredDependency>
+                <ignoredUnusedDeclaredDependency>
+                  org.slf4j:slf4j-log4j12
+                </ignoredUnusedDeclaredDependency>
+              </ignoredUnusedDeclaredDependencies>
+            </configuration>
           <executions>
             <execution>
               <id>create-mrapp-generated-classpath</id>

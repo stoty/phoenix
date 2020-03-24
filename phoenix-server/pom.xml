@@ -83,7 +83,15 @@
  	  <pomFile>${basedir}/pom.xml</pomFile>
         </configuration>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredDependencies>
+            <ignoredDependency>*</ignoredDependency>
+          </ignoredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
