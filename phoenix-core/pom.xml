@@ -167,6 +167,11 @@
   </build>
 
   <dependencies>
+    <!-- HBase compat dependency -->
+    <dependency>
+      <groupId>org.apache.phoenix</groupId>
+      <artifactId>phoenix-hbase-compat-${hbase.compat.version}</artifactId>
+    </dependency>
     <!-- Haddop dependencies -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
