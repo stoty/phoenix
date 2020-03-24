@@ -34,11 +34,11 @@
     </properties>
 
     <dependencies>
-      <!-- Not via dependencymanagement, as we do not want to override the Hadoop/HBase versions -->
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
       </dependency>
+      <!-- Not via dependencymanagement, as we do not want to override the Hadoop/HBase versions -->
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
