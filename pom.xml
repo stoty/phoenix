@@ -361,7 +361,6 @@
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
           <configuration>
-          
                 <ignoredUnusedDeclaredDependencies>
                   <ignoredUnusedDeclaredDependency>
                     org.apache.omid:omid-hbase-shims-hbase2.x
@@ -374,6 +373,9 @@
                   </ignoredUnusedDeclaredDependency>
                   <ignoredUnusedDeclaredDependency>
                     org.apache.omid:omid-timestamp-storage-hbase2.x
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>
+                    org.slf4j:slf4j-log4j12
                   </ignoredUnusedDeclaredDependency>
                 </ignoredUnusedDeclaredDependencies>
               </configuration>
