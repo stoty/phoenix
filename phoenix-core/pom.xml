@@ -298,11 +298,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.omid</groupId>
-      <artifactId>omid-hbase-common-hbase2.x</artifactId>
+      <artifactId>omid-tso-server-hbase2.x</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.omid</groupId>
-      <artifactId>omid-hbase-commit-table-hbase2.x</artifactId>
+      <artifactId>omid-hbase-common-hbase2.x</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.omid</groupId>
@@ -310,7 +310,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.omid</groupId>
-      <artifactId>omid-tso-server-hbase2.x</artifactId>
+      <artifactId>omid-hbase-commit-table-hbase2.x</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.omid</groupId>
