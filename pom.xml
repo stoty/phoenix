@@ -269,6 +269,9 @@
             <shutdown>kill</shutdown>
             <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
             <trimStackTrace>false</trimStackTrace>
+                      <classpathDependencyExcludes>
+          org.apache.tephra:tephra-api,org.apache.tephra:tephra-core
+          </classpathDependencyExcludes>
           </configuration>
           <executions>
             <execution>
@@ -520,6 +523,9 @@
           <redirectTestOutputToFile>${test.output.tofile}</redirectTestOutputToFile>
           <shutdown>kill</shutdown>
           <trimStackTrace>false</trimStackTrace>
+          <classpathDependencyExcludes>
+          org.apache.tephra:tephra-api,org.apache.tephra:tephra-core
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <!-- All projects create a test jar -->

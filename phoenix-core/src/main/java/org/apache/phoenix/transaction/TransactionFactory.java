@@ -18,24 +18,43 @@
 package org.apache.phoenix.transaction;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.phoenix.coprocessor.MetaDataProtocol;
 
-
-
 public class TransactionFactory {
+
+    private static PhoenixTransactionProvider tephraTransactionProvider;
+    
+    static{
+        try {
+            tephraTransactionProvider = (PhoenixTransactionProvider)
+                    Class.forName("org.apache.phoenix.transaction.TephraTransactionProvider")
+                    .newInstance();
+        } catch (Throwable e) {
+        }
+    }
+
     public enum Provider {
-        TEPHRA((byte)1, TephraTransactionProvider.getInstance(), true),
+        TEPHRA((byte)1, tephraTransactionProvider, tephraTransactionProvider != null),
         OMID((byte)2, OmidTransactionProvider.getInstance(), true);
         
         private final byte code;
         private final PhoenixTransactionProvider provider;
         private final boolean runTests;
-        
+                
         Provider(byte code, PhoenixTransactionProvider provider, boolean runTests) {
             this.code = code;
             this.provider = provider;
             this.runTests = runTests;
+        }
+        
+        public static Provider[] available() {
+            if(TEPHRA.getTransactionProvider() != null) {
+                return values();
+            } else {
+                return new Provider[] {OMID};
+            }
         }
         
         public byte getCode() {
