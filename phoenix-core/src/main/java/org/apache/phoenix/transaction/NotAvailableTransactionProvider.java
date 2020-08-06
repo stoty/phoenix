@@ -20,7 +20,6 @@ package org.apache.phoenix.transaction;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.coprocessor.RegionObserver;
@@ -42,31 +41,31 @@ public class NotAvailableTransactionProvider implements PhoenixTransactionProvid
     
     @Override
     public String toString() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException(message);
     }
     
     @Override
     public PhoenixTransactionContext getTransactionContext(byte[] txnBytes) throws IOException {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
     
     @Override
     public PhoenixTransactionContext getTransactionContext(PhoenixConnection connection) throws SQLException {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
 
     @Override
     public PhoenixTransactionClient getTransactionClient(Configuration config, ConnectionInfo connectionInfo) {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
 
     @Override
     public PhoenixTransactionService getTransactionService(Configuration config, ConnectionInfo connInfo, int port) {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
     @Override
     public Class<? extends RegionObserver> getCoprocessor() {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
 
     @Override
@@ -79,11 +78,11 @@ public class NotAvailableTransactionProvider implements PhoenixTransactionProvid
 
     @Override
     public boolean isUnsupported(Feature feature) {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
 
     @Override
     public Put markPutAsCommitted(Put put, long timestamp, long commitTimestamp) {
-        throw new NotImplementedException(message);
+        throw new UnsupportedOperationException(message);
     }
 }
