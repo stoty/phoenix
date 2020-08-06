@@ -29,13 +29,13 @@ import org.apache.phoenix.transaction.TransactionFactory.Provider;
 
 public class NotAvailableTransactionProvider implements PhoenixTransactionProvider {
     private static final NotAvailableTransactionProvider INSTANCE = new NotAvailableTransactionProvider();
-    
+
     private static final String message="This Phoenix has been built without Tephra support";
-    
+
     public static final NotAvailableTransactionProvider getInstance() {
         return INSTANCE;
     }
-    
+
     private NotAvailableTransactionProvider() {
     }
     
@@ -43,12 +43,12 @@ public class NotAvailableTransactionProvider implements PhoenixTransactionProvid
     public String toString() {
         throw new UnsupportedOperationException(message);
     }
-    
+
     @Override
     public PhoenixTransactionContext getTransactionContext(byte[] txnBytes) throws IOException {
         throw new UnsupportedOperationException(message);
     }
-    
+
     @Override
     public PhoenixTransactionContext getTransactionContext(PhoenixConnection connection) throws SQLException {
         throw new UnsupportedOperationException(message);
@@ -63,6 +63,7 @@ public class NotAvailableTransactionProvider implements PhoenixTransactionProvid
     public PhoenixTransactionService getTransactionService(Configuration config, ConnectionInfo connInfo, int port) {
         throw new UnsupportedOperationException(message);
     }
+
     @Override
     public Class<? extends RegionObserver> getCoprocessor() {
         throw new UnsupportedOperationException(message);
