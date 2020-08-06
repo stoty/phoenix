@@ -32,11 +32,13 @@ public class TransactionFactory {
                     Class.forName("org.apache.phoenix.transaction.TephraTransactionProvider")
                     .newInstance();
         } catch (Throwable e) {
+            tephraTransactionProvider = NotAvailableTransactionProvider.getInstance();
         }
     }
 
     public enum Provider {
-        TEPHRA((byte)1, tephraTransactionProvider, tephraTransactionProvider != null),
+        TEPHRA((byte)1, tephraTransactionProvider, 
+            tephraTransactionProvider instanceof TephraTransactionProvider),
         OMID((byte)2, OmidTransactionProvider.getInstance(), true);
         
         private final byte code;
