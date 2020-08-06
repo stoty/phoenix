@@ -52,7 +52,7 @@ public class TransactionFactory {
         }
         
         public static Provider[] available() {
-            if(TEPHRA.getTransactionProvider() != null) {
+            if(TEPHRA.getTransactionProvider() instanceof TephraTransactionProvider) {
                 return values();
             } else {
                 return new Provider[] {OMID};
