@@ -120,7 +120,6 @@
     <zookeeper.version>3.4.10</zookeeper.version>
     <curator.version>4.0.0</curator.version>
     <jcodings.version>1.0.18</jcodings.version>
-    <thrift.version>0.9.0</thrift.version>
     <!-- Test Dependencies -->
     <mockito.version>1.10.19</mockito.version>
     <junit.version>4.13</junit.version>
@@ -1368,17 +1367,6 @@
         <groupId>org.jruby.jcodings</groupId>
         <artifactId>jcodings</artifactId>
         <version>${jcodings.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.thrift</groupId>
-        <artifactId>libthrift</artifactId>
-        <version>${thrift.version}</version>
-        <exclusions>
-           <exclusion>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>

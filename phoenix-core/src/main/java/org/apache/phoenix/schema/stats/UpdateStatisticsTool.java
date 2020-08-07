@@ -48,7 +48,6 @@ import org.apache.phoenix.mapreduce.util.PhoenixConfigurationUtil;
 import org.apache.phoenix.mapreduce.util.PhoenixConfigurationUtil.MRJobType;
 import org.apache.phoenix.mapreduce.util.PhoenixMapReduceUtil;
 import org.apache.phoenix.util.SchemaUtil;
-import org.apache.thrift.transport.TTransportException;
 import org.apache.twill.common.Cancellable;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ZKDiscoveryService;
@@ -217,13 +216,13 @@ public class UpdateStatisticsTool extends Configured implements Tool {
         TableMapReduceUtil.addDependencyJarsForClasses(job.getConfiguration(),
                 PhoenixConnection.class, Chronology.class, CharStream.class, ZKClient.class,
                 DiscoveryServiceClient.class, ZKDiscoveryService.class, Cancellable.class,
-                TTransportException.class, SpanReceiver.class, Gauge.class,
-                MetricRegistriesImpl.class);
+                SpanReceiver.class, Gauge.class, MetricRegistriesImpl.class);
         try {
             TableMapReduceUtil.addDependencyJarsForClasses(job.getConfiguration(),
                 Class.forName("org.apache.tephra.TransactionNotInProgressException"),
                 Class.forName("org.apache.tephra.TransactionSystemClient"),
-                Class.forName("org.apache.tephra.hbase.coprocessor.TransactionProcessor"));
+                Class.forName("org.apache.tephra.hbase.coprocessor.TransactionProcessor"),
+                Class.forName("org.apache.thrift.transport.TTransportException"));
         } catch (Throwable t) {
             //Tephra is excluded
         }
