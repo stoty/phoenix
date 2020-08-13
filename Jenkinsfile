@@ -52,7 +52,7 @@ pipeline {
 
                     stage('BuildAndTest') {
                         steps {
-                            sh "mvn clean package -Dhbase.profile=${HBASE_PROFILE} -B"
+                            sh "mvn clean package -Dhttps.protocols=TLSv1.2 -B"
                         }
                         post {
                             always {
