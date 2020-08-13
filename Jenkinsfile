@@ -41,7 +41,7 @@ pipeline {
 
                 tools {
                     maven "Maven (latest)"
-                    jdk "JDK 1.7 (latest)"
+                    jdk "JDK 1.8 (latest)"
                 }
 
                 environment {
