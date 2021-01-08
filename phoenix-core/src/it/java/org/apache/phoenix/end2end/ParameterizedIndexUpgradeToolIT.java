@@ -146,7 +146,7 @@ public class ParameterizedIndexUpgradeToolIT extends BaseTest {
                 .get(QueryServices.INDEX_REGION_OBSERVER_ENABLED_ATTRIB))
                 || Boolean.toString(!isNamespaceEnabled).equals(serverProps
                 .get(QueryServices.IS_NAMESPACE_MAPPING_ENABLED))) {
-            tearDownMiniClusterAsync(1);
+            tearDownMiniCluster(1);
         }
         //setting up properties for namespace
         clientProps.put(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,

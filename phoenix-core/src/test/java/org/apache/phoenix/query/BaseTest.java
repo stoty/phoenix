@@ -105,6 +105,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -174,10 +176,10 @@ import org.apache.phoenix.thirdparty.com.google.common.util.concurrent.ThreadFac
  * For tests needing connectivity to a cluster, please use
  * {@link BaseHBaseManagedTimeIT}.
  * 
- * In the rare case when a test can't share the same mini cluster as the 
+ * In the rare case when a test can't share the same mini cluster as the
  * ones used by {@link BaseHBaseManagedTimeIT},
- * one could extend this class and spin up your own mini cluster. Please 
- * make sure to shutdown the mini cluster in a method annotated by @AfterClass.  
+ * one could extend this class and spin up your own mini cluster. Please
+ * make sure to shutdown the mini cluster in a method annotated by @AfterClass.
  *
  */
 
@@ -193,6 +195,7 @@ public abstract class BaseTest {
             .setNameFormat("DROP-TABLE-BASETEST" + "-thread-%s").build();
     private static final ExecutorService dropHTableService = Executors
             .newSingleThreadExecutor(factory);
+    private static boolean driverInvalid = false;
 
     @ClassRule
     public static final SystemExitRule SYSTEM_EXIT_RULE = new SystemExitRule();
@@ -476,51 +479,52 @@ public abstract class BaseTest {
         }
     }
 
-    public static void tearDownMiniClusterAsync(final int numTables) {
-        final HBaseTestingUtility u = utility;
+    public static synchronized void tearDownMiniCluster(final int numTables) {
+        HBaseTestingUtility u = utility;
         try {
+            ConnectionFactory.shutdown();
             destroyDriver();
             utility = null;
             clusterInitialized = false;
         } finally {
-            tearDownClusterService.submit(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    long startTime = System.currentTimeMillis();
-                    if (u != null) {
-                        try {
-                            u.shutdownMiniMapReduceCluster();
-                        } catch (Throwable t) {
-                            LOGGER.error(
-                                "Exception caught when shutting down mini map reduce cluster", t);
-                        } finally {
-                            try {
-                                u.shutdownMiniCluster();
-                            } catch (Throwable t) {
-                                LOGGER.error("Exception caught when shutting down mini cluster", t);
-                            } finally {
-                                try {
-                                    ConnectionFactory.shutdown();
-                                } finally {
-                                    LOGGER.info(
-                                        "Time in seconds spent in shutting down mini cluster with "
-                                                + numTables + " tables: "
-                                                + (System.currentTimeMillis() - startTime) / 1000);
-                                }
-                            }
-                        }
+            long startTime = System.currentTimeMillis();
+            if (u != null) {
+                try {
+                    u.shutdownMiniMapReduceCluster();
+                } catch (Throwable t) {
+                    LOGGER.error(
+                        "Exception caught when shutting down mini map reduce cluster", t);
+                } finally {
+                    try {
+                        u.shutdownMiniCluster();
+                    } catch (Throwable t) {
+                        LOGGER.error("Exception caught when shutting down mini cluster", t);
+                    } finally {
+                            LOGGER.info(
+                                "Time in seconds spent in shutting down mini cluster with "
+                                        + numTables + " tables: "
+                                        + (System.currentTimeMillis() - startTime) / 1000);
                     }
-                    return null;
                 }
-            });
+            }
+        }
+    }    
+    
+    public static synchronized void resetHbase() {
+        try {
+            ConnectionFactory.shutdown();
+            destroyDriver();
+            disableAndDropAllTables();
+        } catch (Exception e) {
+            LOGGER.error("Error resetting HBase");
         }
     }
 
-    protected static void setUpTestDriver(ReadOnlyProps props) throws Exception {
+    protected static synchronized void setUpTestDriver(ReadOnlyProps props) throws Exception {
         setUpTestDriver(props, props);
     }
     
-    protected static void setUpTestDriver(ReadOnlyProps serverProps, ReadOnlyProps clientProps) throws Exception {
+    protected static synchronized void setUpTestDriver(ReadOnlyProps serverProps, ReadOnlyProps clientProps) throws Exception {
         if (driver == null) {
             String url = checkClusterInitialized(serverProps);
             driver = initAndRegisterTestDriver(url, clientProps);
@@ -544,7 +548,7 @@ public abstract class BaseTest {
      * @return url to be used by clients to connect to the mini cluster.
      * @throws Exception 
      */
-    private static String initMiniCluster(Configuration conf, ReadOnlyProps overrideProps) throws Exception {
+    private static synchronized String initMiniCluster(Configuration conf, ReadOnlyProps overrideProps) throws Exception {
         setUpConfigForMiniCluster(conf, overrideProps);
         utility = new HBaseTestingUtility(conf);
         try {
@@ -667,7 +671,7 @@ public abstract class BaseTest {
      * Create a {@link PhoenixTestDriver} and register it.
      * @return an initialized and registered {@link PhoenixTestDriver} 
      */
-    public static PhoenixTestDriver initAndRegisterTestDriver(String url, ReadOnlyProps props) throws Exception {
+    public static synchronized PhoenixTestDriver initAndRegisterTestDriver(String url, ReadOnlyProps props) throws Exception {
         PhoenixTestDriver newDriver = newTestDriver(props);
         DriverManager.registerDriver(newDriver);
         Driver oldDriver = DriverManager.getDriver(url); 
@@ -681,7 +685,7 @@ public abstract class BaseTest {
     }
     
     //Close and unregister the driver.
-    protected static boolean destroyDriver(Driver driver) {
+    protected static synchronized boolean destroyDriver(Driver driver) {
         if (driver != null) {
             assert(driver instanceof PhoenixEmbeddedDriver);
             PhoenixEmbeddedDriver pdriver = (PhoenixEmbeddedDriver)driver;
@@ -705,7 +709,7 @@ public abstract class BaseTest {
 
     private static long timestamp;
 
-    public static long nextTimestamp() {
+    public static synchronized long nextTimestamp() {
         timestamp += 100;
         return timestamp;
     }
@@ -792,7 +796,7 @@ public abstract class BaseTest {
         return "S" + Integer.toString(MAX_SEQ_SUFFIX_VALUE + nextName).substring(1);
     }
 
-    public static void freeResourcesIfBeyondThreshold() throws Exception {
+    public static synchronized void freeResourcesIfBeyondThreshold() throws Exception {
         if (TABLE_COUNTER.get() > TEARDOWN_THRESHOLD) {
             int numTables = TABLE_COUNTER.get();
             TABLE_COUNTER.set(0);
@@ -803,9 +807,9 @@ public abstract class BaseTest {
                 deletePriorMetaData(HConstants.LATEST_TIMESTAMP, url);
             } else {
                 LOGGER.info(
-                    "Shutting down mini cluster because number of tables on this mini cluster is likely greater than "
+                    "Clearing all HBase tables in minicluster because number of tables on this mini cluster is likely greater than "
                             + TEARDOWN_THRESHOLD);
-                tearDownMiniClusterAsync(numTables);
+                resetHbase();
             }
 
         }
@@ -909,7 +913,7 @@ public abstract class BaseTest {
         }
     }
 
-    protected static void deletePriorMetaData(long ts, String url) throws Exception {
+    protected static synchronized void deletePriorMetaData(long ts, String url) throws Exception {
         deletePriorTables(ts, url);
         if (ts != HConstants.LATEST_TIMESTAMP) {
             ts = nextTimestamp() - 1;
@@ -1572,7 +1576,7 @@ public abstract class BaseTest {
     /**
      * Disable and drop all non system tables
      */
-    protected static void disableAndDropNonSystemTables() throws Exception {
+    protected static synchronized void disableAndDropNonSystemTables() throws Exception {
         if (driver == null) return;
         Admin admin = driver.getConnectionQueryServices(null, null).getAdmin();
         try {
@@ -1588,7 +1592,7 @@ public abstract class BaseTest {
         }
     }
     
-    private static void disableAndDropTable(final Admin admin, final TableName tableName)
+    private static synchronized void disableAndDropTable(final Admin admin, final TableName tableName)
             throws Exception {
         Future<Void> future = null;
         boolean success = false;
@@ -1619,6 +1623,46 @@ public abstract class BaseTest {
                 future.cancel(true);
             }
         }
+    }
+
+    private static synchronized void disableAndDropAllTables() throws IOException {
+        Admin admin = utility.getAdmin();
+        
+        ExecutorService dropHTableExecutor = Executors
+                .newCachedThreadPool(factory);
+        
+        List<TableDescriptor> tableDescriptors = admin.listTableDescriptors();
+        
+        int retryCount=10;
+        List<Future<Void>> futures = new ArrayList<>();
+        while (!tableDescriptors.isEmpty() && retryCount-->0) {
+            
+            for(TableDescriptor tableDescriptor : tableDescriptors) {
+                futures.add(dropHTableExecutor.submit(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        if (admin.isTableEnabled(tableDescriptor.getTableName())) {
+                            admin.disableTable(tableDescriptor.getTableName());
+                        }
+                        admin.deleteTable(tableDescriptor.getTableName());
+                        return null;
+                    }
+                }));
+            }
+            for (Future<Void> future : futures) {
+                try {
+                    future.get(dropTableTimeout, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    LOGGER.warn("Error while dropping table, will try again", e);
+                }
+            }
+            
+            tableDescriptors = admin.listTableDescriptors();
+        }
+        if(!tableDescriptors.isEmpty()) {
+           LOGGER.error("Could not clean up tables!");
+        }
+
     }
     
     public static void assertOneOfValuesEqualsResultSet(ResultSet rs, List<List<Object>>... expectedResultsArray) throws SQLException {
@@ -1714,7 +1758,7 @@ public abstract class BaseTest {
     }
 
     // Populate the test table with data.
-    public static void populateTestTable(String fullTableName) throws SQLException {
+    public static synchronized void populateTestTable(String fullTableName) throws SQLException {
         Properties props = PropertiesUtil.deepCopy(TEST_PROPERTIES);
         try (Connection conn = DriverManager.getConnection(getUrl(), props)) {
             upsertRows(conn, fullTableName, 3);
