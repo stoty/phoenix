@@ -27,6 +27,7 @@ import org.apache.phoenix.jdbc.PhoenixConnection;
 import org.apache.phoenix.schema.transform.TransformMaintainer;
 import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.transaction.TransactionFactory;
+import org.apache.phoenix.util.ExpressionContext;
 
 public class DelegateTable implements PTable {
     @Override
@@ -130,8 +131,8 @@ public class DelegateTable implements PTable {
     }
 
     @Override
-    public int newKey(ImmutableBytesWritable key, byte[][] values) {
-        return delegate.newKey(key, values);
+    public int newKey(ImmutableBytesWritable key, byte[][] values, ExpressionContext context) {
+        return delegate.newKey(key, values, context);
     }
 
     @Override

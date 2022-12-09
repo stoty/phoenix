@@ -43,6 +43,7 @@ import org.apache.phoenix.schema.types.PArrayDataTypeEncoder;
 import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.schema.types.PVarbinary;
 import org.apache.phoenix.transaction.TransactionFactory;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.TrustedByteArrayOutputStream;
 
 import org.apache.phoenix.thirdparty.com.google.common.annotations.VisibleForTesting;
@@ -779,10 +780,11 @@ public interface PTable extends PMetaDataEntity {
      * the same order as {@link #getPKColumns()}.
      * @param key bytes pointer that will be filled in with the row key
      * @param values the PK column values
+     * @param ExpressionContext for default values
      * @return the number of values that were used from values to set
      * the row key
      */
-    int newKey(ImmutableBytesWritable key, byte[][] values);
+    int newKey(ImmutableBytesWritable key, byte[][] values, ExpressionContext context);
 
     RowKeySchema getRowKeySchema();
 

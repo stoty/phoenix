@@ -110,6 +110,7 @@ import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.schema.types.PLong;
 import org.apache.phoenix.util.EncodedColumnsUtil;
 import org.apache.phoenix.util.EnvironmentEdgeManager;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.IndexUtil;
 import org.apache.phoenix.util.PhoenixKeyValueUtil;
 import org.apache.phoenix.util.PhoenixRuntime;
@@ -816,7 +817,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         }
     }
 
-    static List<Expression> deserializeExpressions(byte[] b) {
+    static List<Expression> deserializeExpressions(byte[] b, ExpressionContext context) {
         ByteArrayInputStream stream = new ByteArrayInputStream(b);
         try {
             DataInputStream input = new DataInputStream(stream);
@@ -825,7 +826,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
             for (int i = 0; i < size; i++) {
                 ExpressionType type = ExpressionType.values()[WritableUtils.readVInt(input)];
                 Expression selectExpression = type.newInstance();
-                selectExpression.readFields(input);
+                selectExpression.readFields(input, context);
                 selectExpressions.add(selectExpression);
             }
             return selectExpressions;

@@ -108,6 +108,7 @@ import org.apache.phoenix.transaction.TransactionFactory;
 import org.apache.phoenix.util.ByteUtil;
 import org.apache.phoenix.util.EncodedColumnsUtil;
 import org.apache.phoenix.util.EnvironmentEdgeManager;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.ExpressionUtil;
 import org.apache.phoenix.util.IndexUtil;
 import org.apache.phoenix.util.LogUtil;
@@ -234,8 +235,8 @@ public class UngroupedAggregateRegionScanner extends BaseRegionScanner {
             targetHTable =
                     targetPConn.getQueryServices()
                             .getTable(projectedTable.getPhysicalName().getBytes());
+            selectExpressions = deserializeExpressions(scan.getAttribute(BaseScannerRegionObserver.UPSERT_SELECT_EXPRS), targetPConn.getExpressionContext());
             // TODO Can't we just close the PhoenixConnection immediately here ?
-            selectExpressions = deserializeExpressions(scan.getAttribute(BaseScannerRegionObserver.UPSERT_SELECT_EXPRS));
             values = new byte[projectedTable.getPKColumns().size()][];
             isPKChanging = ExpressionUtil.isPkPositionChanging(new TableRef(projectedTable), selectExpressions);
         } else {
@@ -369,7 +370,7 @@ public class UngroupedAggregateRegionScanner extends BaseRegionScanner {
             }
             values[i] = ptr.copyBytes();
         }
-        writeToTable.newKey(ptr, values);
+        writeToTable.newKey(ptr, values,ScanUtil.getExpressionContext(scan));
         if (Bytes.compareTo(
                 firstKV.getRowArray(), firstKV.getRowOffset() + offset, firstKV.getRowLength(),
                 ptr.get(),ptr.getOffset() + offset,ptr.getLength()) == 0) {
@@ -483,6 +484,7 @@ public class UngroupedAggregateRegionScanner extends BaseRegionScanner {
             mutations.add(delete);
         }
     }
+
     void upsert(Tuple result, ImmutableBytesWritable ptr, UngroupedAggregateRegionObserver.MutationList mutations) {
         Arrays.fill(values, null);
         int bucketNumOffset = 0;
@@ -507,7 +509,7 @@ public class UngroupedAggregateRegionScanner extends BaseRegionScanner {
                 values[i] = ByteUtil.EMPTY_BYTE_ARRAY;
             }
         }
-        projectedTable.newKey(ptr, values);
+        projectedTable.newKey(ptr, values, ScanUtil.getExpressionContext(scan));
         PRow row = projectedTable.newRow(GenericKeyValueBuilder.INSTANCE, ts, ptr, false);
         for (; i < projectedColumns.size(); i++) {
             Expression expression = selectExpressions.get(i - bucketNumOffset);

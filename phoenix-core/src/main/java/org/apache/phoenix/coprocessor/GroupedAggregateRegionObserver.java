@@ -77,6 +77,7 @@ import org.apache.phoenix.schema.types.PInteger;
 import org.apache.phoenix.util.Closeables;
 import org.apache.phoenix.util.EncodedColumnsUtil;
 import org.apache.phoenix.util.EnvironmentEdgeManager;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.IndexUtil;
 import org.apache.phoenix.util.LogUtil;
 import org.apache.phoenix.util.PhoenixKeyValueUtil;
@@ -135,7 +136,7 @@ public class GroupedAggregateRegionObserver extends BaseScannerRegionObserver im
             ScanUtil.setRowKeyOffset(scan, offset);
         }
 
-        List<Expression> expressions = deserializeGroupByExpressions(expressionBytes, 0);
+        List<Expression> expressions = deserializeGroupByExpressions(expressionBytes, 0, ScanUtil.getExpressionContext(scan));
         final TenantCache tenantCache = GlobalCache.getTenantCache(c.getEnvironment(), ScanUtil.getTenantId(scan));
         try (MemoryChunk em = tenantCache.getMemoryManager().allocate(0)) {
             ServerAggregators aggregators =
@@ -217,7 +218,8 @@ public class GroupedAggregateRegionObserver extends BaseScannerRegionObserver im
 
     }
 
-    private List<Expression> deserializeGroupByExpressions(byte[] expressionBytes, int offset)
+    private List<Expression> deserializeGroupByExpressions(byte[] expressionBytes, int offset,
+            ExpressionContext context)
             throws IOException {
         List<Expression> expressions = new ArrayList<Expression>(3);
         ByteArrayInputStream stream = new ByteArrayInputStream(expressionBytes);
@@ -228,7 +230,7 @@ public class GroupedAggregateRegionObserver extends BaseScannerRegionObserver im
                     int expressionOrdinal = WritableUtils.readVInt(input);
                     Expression expression =
                             ExpressionType.values()[expressionOrdinal].newInstance();
-                    expression.readFields(input);
+                    expression.readFields(input, context);
                     if (offset != 0) {
                         IndexUtil.setRowKeyExpressionOffset(expression, offset);
                     }

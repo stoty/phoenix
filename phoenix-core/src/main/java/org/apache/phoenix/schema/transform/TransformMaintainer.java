@@ -398,6 +398,7 @@ public class TransformMaintainer extends IndexMaintainer {
             while (stream.available() > 0) {
                 int expressionOrdinal = WritableUtils.readVInt(input);
                 Expression expression = ExpressionType.values()[expressionOrdinal].newInstance();
+                //FIXME ExpressionContext ???
                 expression.readFields(input);
                 maintainer.newTableExpressions.add(expression);
             }

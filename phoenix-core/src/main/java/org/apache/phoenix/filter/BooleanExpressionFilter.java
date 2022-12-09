@@ -30,6 +30,7 @@ import org.apache.phoenix.expression.Expression;
 import org.apache.phoenix.expression.ExpressionType;
 import org.apache.phoenix.schema.IllegalDataException;
 import org.apache.phoenix.schema.tuple.Tuple;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.ServerUtil;
 
 
@@ -113,6 +114,9 @@ abstract public class BooleanExpressionFilter extends FilterBase implements Writ
         }
     }
 
+    // No readFields(DataInput input, ExpressionContext context), because this is always
+    // deserialized directly from HBase.
+
     @Override
     public void write(DataOutput output) throws IOException {
         try {
@@ -131,5 +135,9 @@ abstract public class BooleanExpressionFilter extends FilterBase implements Writ
     @Override
     public void reset() {
         expression.reset();
+    }
+
+    public void setContext(ExpressionContext expressionContext) {
+        expression.setContext(expressionContext);
     }
 }

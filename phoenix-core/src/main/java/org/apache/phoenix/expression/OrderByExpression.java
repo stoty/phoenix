@@ -29,6 +29,7 @@ import org.apache.hadoop.io.WritableUtils;
 import org.apache.phoenix.compile.OrderByCompiler;
 import org.apache.phoenix.compile.OrderPreservingTracker.Info;
 import org.apache.phoenix.schema.SortOrder;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.execute.AggregatePlan;
 
 /**
@@ -38,7 +39,7 @@ public class OrderByExpression implements Writable {
     private Expression expression;
     private boolean isNullsLast;
     private boolean isAscending;
-    
+
     public OrderByExpression() {
     }
 
@@ -191,4 +192,12 @@ public class OrderByExpression implements Writable {
         expression.write(output);
     }
 
+    public void readFields(DataInput in, ExpressionContext context) throws IOException {
+        readFields(in);
+        setContext(context);
+    }
+
+    public void setContext(ExpressionContext context) {
+        expression.setContext(context);
+    }
 }

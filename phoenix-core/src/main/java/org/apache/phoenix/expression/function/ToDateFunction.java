@@ -38,7 +38,6 @@ import org.apache.phoenix.schema.types.PTimestamp;
 import org.apache.phoenix.schema.types.PVarchar;
 import org.apache.phoenix.util.DateUtil;
 import org.apache.phoenix.util.ExpressionContext;
-import org.apache.phoenix.util.ThreadExpressionCtx;
 
 
 /**
@@ -89,13 +88,6 @@ public class ToDateFunction extends ScalarFunction {
         this.codec = PTimestamp.getCodecFor(getDataType());
     }
 
-    private ExpressionContext getContext() {
-        if (context == null) {
-            context = ThreadExpressionCtx.get();
-        }
-        return context;
-    }
-    
     protected DateUtil.DateTimeParser getDateParser() {
         // Lazy initialization
         // FIXME are these checks too slow - Don't think so ? 

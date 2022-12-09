@@ -108,11 +108,11 @@ import org.apache.phoenix.schema.types.PVarchar;
 import org.apache.phoenix.transaction.TransactionFactory;
 import org.apache.phoenix.util.ByteUtil;
 import org.apache.phoenix.util.EncodedColumnsUtil;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.MetaDataUtil;
 import org.apache.phoenix.util.PhoenixRuntime;
 import org.apache.phoenix.util.SchemaUtil;
 import org.apache.phoenix.util.SizedUtil;
-import org.apache.phoenix.util.ThreadExpressionCtx;
 import org.apache.phoenix.util.TrustedByteArrayOutputStream;
 
 import org.apache.phoenix.thirdparty.com.google.common.base.Objects;
@@ -1123,7 +1123,7 @@ public class PTableImpl implements PTable {
     }
 
     @Override
-    public int newKey(ImmutableBytesWritable key, byte[][] values) {
+    public int newKey(ImmutableBytesWritable key, byte[][] values, ExpressionContext expressionContext) {
         List<PColumn> columns = getPKColumns();
         int nValues = values.length;
         while (nValues > 0 && (values[nValues-1] == null || values[nValues-1].length == 0)) {
@@ -1165,7 +1165,7 @@ public class PTableImpl implements PTable {
                                     + PhoenixRuntime.JDBC_PROTOCOL_SEPARATOR
                                     + PhoenixRuntime.CONNECTIONLESS;
                             PhoenixConnection conn = DriverManager.getConnection(url,
-                                ThreadExpressionCtx.get().toProps())
+                                expressionContext.toProps())
                                     .unwrap(PhoenixConnection.class)
                                     .unwrap(PhoenixConnection.class);
                             StatementContext context =
@@ -1510,6 +1510,7 @@ public class PTableImpl implements PTable {
          * {@link org.apache.phoenix.coprocessor.ScanRegionObserver#preBatchMutate(ObserverContext,
          * MiniBatchOperationInProgress)}
          */
+        @Override
         public boolean setAttributesForDynamicColumnsIfReqd() {
             if (this.colFamToDynamicColumnsMapping == null ||
                     this.colFamToDynamicColumnsMapping.isEmpty()) {

@@ -169,7 +169,7 @@ public class UpsertCompiler {
             }
         }
         ImmutableBytesPtr ptr = new ImmutableBytesPtr();
-        table.newKey(ptr, pkValues);
+        table.newKey(ptr, pkValues, statement.getConnection().getExpressionContext());
         if (table.getIndexType() == IndexType.LOCAL && maintainer != null) {
             byte[] rowKey = maintainer.buildDataRowKey(ptr, viewConstants);
             HRegionLocation region =

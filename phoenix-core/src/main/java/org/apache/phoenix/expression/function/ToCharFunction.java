@@ -27,7 +27,6 @@ import org.apache.hadoop.io.WritableUtils;
 import org.apache.phoenix.thirdparty.com.google.common.annotations.VisibleForTesting;
 import org.apache.phoenix.thirdparty.com.google.common.base.Preconditions;
 import org.apache.phoenix.util.ExpressionContext;
-import org.apache.phoenix.util.ThreadExpressionCtx;
 import org.apache.phoenix.compile.StatementContext;
 import org.apache.phoenix.expression.Expression;
 import org.apache.phoenix.expression.LiteralExpression;
@@ -176,13 +175,6 @@ public class ToCharFunction extends ScalarFunction {
         return children.get(0);
     }
 
-    private ExpressionContext getContext() {
-        if (context == null) {
-            context = ThreadExpressionCtx.get();
-        }
-        return context;
-    }
-    
     private Format getFormatter() {
         if (formatter == null) {
             formatter = type.getFormatter(formatString, getContext());

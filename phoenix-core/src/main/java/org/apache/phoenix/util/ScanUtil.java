@@ -42,6 +42,7 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.Mutation;
+import org.apache.hadoop.hbase.client.OperationWithAttributes;
 import org.apache.hadoop.hbase.client.RegionInfo;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
@@ -772,7 +773,7 @@ public class ScanUtil {
     public static int getRowKeyOffset(byte[] regionStartKey, byte[] regionEndKey) {
         return regionStartKey.length > 0 ? regionStartKey.length : regionEndKey.length;
     }
-    
+
     private static void setRowKeyOffset(Filter filter, int offset) {
         if (filter instanceof BooleanExpressionFilter) {
             BooleanExpressionFilter boolFilter = (BooleanExpressionFilter)filter;
@@ -1431,7 +1432,7 @@ public class ScanUtil {
         }
     }
 
-    public static void setExpressionContext(ExpressionContext ctx, Scan scan) {
+    public static void setExpressionContext(ExpressionContext ctx, OperationWithAttributes scan) {
         if (ctx.isCompliant()) {
             scan.setAttribute(BaseScannerRegionObserver.USE_COMPLIANT_TEMPORAL,
                 PDataType.TRUE_BYTES);
@@ -1450,12 +1451,10 @@ public class ScanUtil {
                 scan.setAttribute(BaseScannerRegionObserver.TIME_PATTERN,
                     Bytes.toBytes(ctx.getTimeFormatPattern()));
             }
-        } else {
-            int dummy = 0;
         }
     }
 
-    public static ExpressionContext getExpressionContext(Scan scan) {
+    public static ExpressionContext getExpressionContext(OperationWithAttributes scan) {
         if (Bytes.equals(TRUE_BYTES,
             scan.getAttribute(BaseScannerRegionObserver.USE_COMPLIANT_TEMPORAL))) {
             String timeZoneId = 

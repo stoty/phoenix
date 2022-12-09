@@ -176,6 +176,7 @@ import org.apache.phoenix.coprocessor.generated.MetaDataProtos.GetVersionRequest
 import org.apache.phoenix.coprocessor.generated.MetaDataProtos.GetVersionResponse;
 import org.apache.phoenix.coprocessor.generated.MetaDataProtos.MetaDataResponse;
 import org.apache.phoenix.coprocessor.generated.MetaDataProtos.UpdateIndexStateRequest;
+import org.apache.phoenix.coprocessor.generated.PropertyProtos;
 import org.apache.phoenix.exception.SQLExceptionCode;
 import org.apache.phoenix.exception.SQLExceptionInfo;
 import org.apache.phoenix.expression.Expression;
@@ -3499,7 +3500,7 @@ TABLE_FAMILY_BYTES, TABLE_SEQ_NUM_BYTES);
             PTable parentTable = request.hasParentTable() ? PTableImpl.createFromProto(request.getParentTable()) : null;
             PTable transformingNewTable = request.hasTransformingNewTable() ? PTableImpl.createFromProto(request.getTransformingNewTable()) : null;
             boolean addingColumns = request.getAddingColumns();
-            List<MetaDataProtos.Property> protoProps = request.getContextParamsList();
+            List<PropertyProtos.Property> protoProps = request.getContextParamsList();
             CallRunner.run(new CallRunner.CallableThrowable<Void, Exception>() {
                 @Override
                 public Void call() throws Exception {
@@ -3643,7 +3644,7 @@ TABLE_FAMILY_BYTES, TABLE_SEQ_NUM_BYTES);
         try {
             List<Mutation>  tableMetaData = ProtobufUtil.getMutations(request);
             PTable parentTable = request.hasParentTable() ? PTableImpl.createFromProto(request.getParentTable()) : null;
-            List<MetaDataProtos.Property> protoProps = request.getContextParamsList();
+            List<PropertyProtos.Property> protoProps = request.getContextParamsList();
             CallRunner.run(new CallRunner.CallableThrowable<Void, Exception>() {
                 @Override
                 public Void call() throws Exception {

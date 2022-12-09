@@ -65,6 +65,7 @@ import org.apache.phoenix.schema.PTable;
 import org.apache.phoenix.schema.PTableImpl;
 import org.apache.phoenix.schema.tuple.MultiKeyValueTuple;
 import org.apache.phoenix.util.ByteUtil;
+import org.apache.phoenix.util.ScanUtil;
 import org.apache.phoenix.util.TrustedByteArrayOutputStream;
 
 import org.apache.phoenix.thirdparty.com.google.common.collect.Lists;
@@ -74,6 +75,7 @@ import org.apache.phoenix.thirdparty.com.google.common.collect.Lists;
  */
 public class PhoenixIndexBuilder extends NonTxIndexBuilder {
     public static final String ATOMIC_OP_ATTRIB = "_ATOMIC_OP_ATTRIB";
+    public static final String ATOMIC_OP_CONTEXT = "_ATOMIC_OP_CONTEXT";
     private static final byte[] ON_DUP_KEY_IGNORE_BYTES = new byte[] {1}; // boolean true
     private static final int ON_DUP_KEY_HEADER_BYTE_SIZE = Bytes.SIZEOF_SHORT + Bytes.SIZEOF_BOOLEAN;
     
@@ -180,7 +182,7 @@ public class PhoenixIndexBuilder extends NonTxIndexBuilder {
                 List<Expression>expressions = Lists.newArrayListWithExpectedSize(nExpressions);
                 for (int i = 0; i < nExpressions; i++) {
                     Expression expression = ExpressionType.values()[WritableUtils.readVInt(input)].newInstance();
-                    expression.readFields(input);
+                    expression.readFields(input, ScanUtil.getExpressionContext(inc));
                     expressions.add(expression);
                     expression.accept(visitor);                    
                 }

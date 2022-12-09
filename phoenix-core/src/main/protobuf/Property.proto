@@ -15,31 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.phoenix.expression.function;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.List;
+option java_package = "org.apache.phoenix.coprocessor.generated";
+option java_outer_classname = "PropertyProtos";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
 
-import org.apache.phoenix.expression.Expression;
-import org.apache.phoenix.schema.types.PDataType.PDataCodec;
-import org.apache.phoenix.util.ExpressionContext;
-
-public abstract class TemporalScalarFunction extends ScalarFunction {
-    protected PDataCodec inputCodec;
-
-    public TemporalScalarFunction() {
-    }
-
-    public TemporalScalarFunction(List<Expression> children, ExpressionContext context) {
-        super(children);
-        //FIXME remove it
-        this.context = context;
-    }
-
-    @Override
-    public void readFields(DataInput input) throws IOException {
-        super.readFields(input);
-    }
-
+message Property {
+  required string key = 1;
+  required string value = 2;
 }

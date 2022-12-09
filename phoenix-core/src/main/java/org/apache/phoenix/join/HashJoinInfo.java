@@ -36,6 +36,7 @@ import org.apache.phoenix.schema.KeyValueSchema;
 import org.apache.phoenix.schema.KeyValueSchema.KeyValueSchemaBuilder;
 import org.apache.phoenix.schema.PColumn;
 import org.apache.phoenix.schema.PTable;
+import org.apache.phoenix.util.ScanUtil;
 import org.apache.phoenix.util.SchemaUtil;
 
 public class HashJoinInfo {
@@ -195,7 +196,7 @@ public class HashJoinInfo {
                 for (int j = 0; j < nExprs; j++) {
                     int expressionOrdinal = WritableUtils.readVInt(input);
                     Expression expression = ExpressionType.values()[expressionOrdinal].newInstance();
-                    expression.readFields(input);
+                    expression.readFields(input, ScanUtil.getExpressionContext(scan));
                     joinExpressions[i].add(expression);
                 }
                 int type = WritableUtils.readVInt(input);

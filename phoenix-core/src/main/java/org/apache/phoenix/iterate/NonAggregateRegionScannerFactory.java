@@ -71,6 +71,7 @@ import org.apache.phoenix.schema.types.PInteger;
 import org.apache.phoenix.transaction.PhoenixTransactionContext;
 import org.apache.phoenix.transaction.TransactionFactory;
 import org.apache.phoenix.util.EncodedColumnsUtil;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.IndexUtil;
 import org.apache.phoenix.util.ScanUtil;
 import org.apache.phoenix.util.ServerUtil;
@@ -188,6 +189,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
         if (topN == null) {
             return null;
         }
+        ExpressionContext expressionContext = ScanUtil.getExpressionContext(scan);
         int clientVersion = ScanUtil.getClientVersion(scan);
         // Client including and after 4.15 and 5.1 are not going to serialize thresholdBytes
         // so we need to decode this only for older clients to not break wire compat
@@ -212,7 +214,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
             List<OrderByExpression> orderByExpressions = Lists.newArrayListWithExpectedSize(size);
             for (int i = 0; i < size; i++) {
                 OrderByExpression orderByExpression = new OrderByExpression();
-                orderByExpression.readFields(input);
+                orderByExpression.readFields(input, expressionContext);
                 orderByExpressions.add(orderByExpression);
             }
             PTable.QualifierEncodingScheme encodingScheme = EncodedColumnsUtil.getQualifierEncodingScheme(scan);
@@ -236,6 +238,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
         if (specificArrayIdx == null) {
             return null;
         }
+        ExpressionContext expressionContext = ScanUtil.getExpressionContext(scan);
         ByteArrayInputStream stream = new ByteArrayInputStream(specificArrayIdx);
         try {
             DataInputStream input = new DataInputStream(stream);
@@ -244,14 +247,14 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
                 PTable.ImmutableStorageScheme scheme = EncodedColumnsUtil.getImmutableStorageScheme(scan);
                 KeyValueColumnExpression kvExp = scheme != PTable.ImmutableStorageScheme.ONE_CELL_PER_COLUMN ? new SingleCellColumnExpression(scheme)
                         : new KeyValueColumnExpression();
-                kvExp.readFields(input);
+                kvExp.readFields(input, expressionContext);
                 arrayKVRefs.add(kvExp);
             }
             int arrayKVFuncSize = WritableUtils.readVInt(input);
             Expression[] arrayFuncRefs = new Expression[arrayKVFuncSize];
             for (int i = 0; i < arrayKVFuncSize; i++) {
                 ArrayIndexFunction arrayIdxFunc = new ArrayIndexFunction();
-                arrayIdxFunc.readFields(input);
+                arrayIdxFunc.readFields(input, expressionContext);
                 arrayFuncRefs[i] = arrayIdxFunc;
             }
             return arrayFuncRefs;

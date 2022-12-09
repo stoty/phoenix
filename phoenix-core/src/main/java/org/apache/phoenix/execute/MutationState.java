@@ -117,6 +117,7 @@ import org.apache.phoenix.util.IndexUtil;
 import org.apache.phoenix.util.LogUtil;
 import org.apache.phoenix.util.PhoenixKeyValueUtil;
 import org.apache.phoenix.util.SQLCloseable;
+import org.apache.phoenix.util.ScanUtil;
 import org.apache.phoenix.util.SchemaUtil;
 import org.apache.phoenix.util.ServerUtil;
 import org.apache.phoenix.util.SizedUtil;
@@ -749,6 +750,7 @@ public class MutationState implements SQLCloseable {
                 for (Mutation mutation : rowMutations) {
                     if (onDupKeyBytes != null) {
                         mutation.setAttribute(PhoenixIndexBuilder.ATOMIC_OP_ATTRIB, onDupKeyBytes);
+                        ScanUtil.setExpressionContext(connection.getExpressionContext(), mutation);
                     }
                 }
                 rowMutationsPertainingToIndex = rowMutations;

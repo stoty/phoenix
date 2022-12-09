@@ -60,8 +60,10 @@ import org.apache.phoenix.schema.ValueBitSet;
 import org.apache.phoenix.schema.tuple.BaseTuple;
 import org.apache.phoenix.schema.tuple.Tuple;
 import org.apache.phoenix.util.ByteUtil;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.PhoenixKeyValueUtil;
 import org.apache.phoenix.util.PhoenixRuntime;
+import org.apache.phoenix.util.ScanUtil;
 import org.apache.phoenix.util.SchemaUtil;
 
 import org.apache.phoenix.thirdparty.com.google.common.base.Preconditions;
@@ -164,7 +166,8 @@ public class TupleProjector {
     }
     
     public static TupleProjector deserializeProjectorFromScan(Scan scan) {
-        return deserializeProjectorFromBytes(scan.getAttribute(SCAN_PROJECTOR));
+        return deserializeProjectorFromBytes(scan.getAttribute(SCAN_PROJECTOR),
+            ScanUtil.getExpressionContext(scan));
     }
 
     /**
@@ -172,7 +175,7 @@ public class TupleProjector {
      * @param proj byte array to deserialize
      * @return projector
      */
-    private static TupleProjector deserializeProjectorFromBytes(byte[] proj) {
+    private static TupleProjector deserializeProjectorFromBytes(byte[] proj, ExpressionContext context) {
         if (proj == null) {
             return null;
         }
@@ -186,7 +189,7 @@ public class TupleProjector {
             for (int i = 0; i < count; i++) {
                 int ordinal = WritableUtils.readVInt(input);
                 expressions[i] = ExpressionType.values()[ordinal].newInstance();
-                expressions[i].readFields(input);
+                expressions[i].readFields(input, context);
             }
             return new TupleProjector(schema, expressions);
         } catch (IOException e) {

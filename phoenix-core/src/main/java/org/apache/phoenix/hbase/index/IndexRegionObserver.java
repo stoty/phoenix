@@ -109,6 +109,7 @@ import org.apache.phoenix.index.PhoenixIndexMetaData;
 import org.apache.phoenix.query.KeyRange;
 import org.apache.phoenix.query.QueryConstants;
 import org.apache.phoenix.query.QueryServicesOptions;
+import org.apache.phoenix.schema.ConnectionProperty;
 import org.apache.phoenix.schema.PColumn;
 import org.apache.phoenix.schema.PRow;
 import org.apache.phoenix.schema.PTable;
@@ -121,7 +122,9 @@ import org.apache.phoenix.trace.TracingUtils;
 import org.apache.phoenix.trace.util.NullSpan;
 import org.apache.phoenix.util.ByteUtil;
 import org.apache.phoenix.util.EnvironmentEdgeManager;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.IndexUtil;
+import org.apache.phoenix.util.ScanUtil;
 import org.apache.phoenix.util.SchemaUtil;
 import org.apache.phoenix.util.ServerUtil;
 import org.apache.phoenix.util.ServerUtil.ConnectionType;
@@ -1395,7 +1398,8 @@ public class IndexRegionObserver implements RegionCoprocessor, RegionObserver {
 
   private void extractExpressionsAndColumns(DataInputStream input,
                               List<Pair<PTable, List<Expression>>> operations,
-                              final Set<ColumnReference> colsReadInExpr) throws IOException {
+                              final Set<ColumnReference> colsReadInExpr,
+                              ExpressionContext context) throws IOException {
       while (true) {
           ExpressionVisitor<Void> visitor = new StatelessTraverseAllExpressionVisitor<Void>() {
               @Override
@@ -1409,7 +1413,7 @@ public class IndexRegionObserver implements RegionCoprocessor, RegionObserver {
               List<Expression> expressions = Lists.newArrayListWithExpectedSize(nExpressions);
               for (int i = 0; i < nExpressions; i++) {
                   Expression expression = ExpressionType.values()[WritableUtils.readVInt(input)].newInstance();
-                  expression.readFields(input);
+                  expression.readFields(input, context);
                   expressions.add(expression);
                   expression.accept(visitor);
               }
@@ -1469,7 +1473,8 @@ public class IndexRegionObserver implements RegionCoprocessor, RegionObserver {
       final Set<ColumnReference> colsReadInExpr = new HashSet<>();
       // deserialize the conditional update expressions and
       // extract the columns that are read in the conditional expressions
-      extractExpressionsAndColumns(input, operations, colsReadInExpr);
+      extractExpressionsAndColumns(input, operations, colsReadInExpr,
+          ScanUtil.getExpressionContext(atomicPut));
       int estimatedSize = colsReadInExpr.size();
 
       // initialized to either the incoming new row or the current row

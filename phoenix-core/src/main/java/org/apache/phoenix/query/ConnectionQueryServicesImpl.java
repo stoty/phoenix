@@ -213,6 +213,7 @@ import org.apache.phoenix.coprocessor.generated.MetaDataProtos.GetVersionRespons
 import org.apache.phoenix.coprocessor.generated.MetaDataProtos.MetaDataResponse;
 import org.apache.phoenix.coprocessor.generated.MetaDataProtos.MetaDataService;
 import org.apache.phoenix.coprocessor.generated.MetaDataProtos.UpdateIndexStateRequest;
+import org.apache.phoenix.coprocessor.generated.PropertyProtos;
 import org.apache.phoenix.exception.InvalidRegionSplitPolicyException;
 import org.apache.phoenix.exception.PhoenixIOException;
 import org.apache.phoenix.exception.RetriableUpgradeException;
@@ -2570,7 +2571,7 @@ public class ConnectionQueryServicesImpl extends DelegateQueryServices implement
                     }
                     builder.setAddingColumns(addingColumns);
                     for(Entry prop : expressionCtx.toProps().entrySet()) {
-                            builder.addContextParams(MetaDataProtos.Property.newBuilder()
+                            builder.addContextParams(PropertyProtos.Property.newBuilder()
                                     .setKey((String) (prop.getKey()))
                                     .setValue((String) (prop.getValue())));
                     }
@@ -3292,7 +3293,7 @@ public class ConnectionQueryServicesImpl extends DelegateQueryServices implement
                 if (parentTable!=null)
                     builder.setParentTable(PTableImpl.toProto(parentTable));
                 for(Entry prop : expressionCtx.toProps().entrySet()) {
-                    builder.addContextParams(MetaDataProtos.Property.newBuilder()
+                    builder.addContextParams(PropertyProtos.Property.newBuilder()
                             .setKey((String) (prop.getKey()))
                             .setValue((String) (prop.getValue())));
                 }

@@ -40,7 +40,6 @@ import java.util.Map;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.CompareOperator;
-import org.apache.hadoop.hbase.GenericTestUtils;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.CoprocessorDescriptor;
@@ -74,6 +73,7 @@ import org.apache.phoenix.schema.RowKeySchema;
 import org.apache.phoenix.schema.SortOrder;
 import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.util.EncodedColumnsUtil;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.IndexUtil;
 import org.apache.phoenix.util.MetaDataUtil;
 import org.apache.phoenix.util.PhoenixRuntime;
@@ -113,17 +113,20 @@ public class IndexTestUtil {
     }
     
     public static List<Mutation> generateIndexData(PTable index, PTable table,
-            List<Mutation> dataMutations, ImmutableBytesWritable ptr, KeyValueBuilder builder)
+            List<Mutation> dataMutations, ImmutableBytesWritable ptr, KeyValueBuilder builder,
+            ExpressionContext context)
             throws SQLException {
         List<Mutation> indexMutations = Lists.newArrayListWithExpectedSize(dataMutations.size());
         for (Mutation dataMutation : dataMutations) {
-            indexMutations.addAll(generateIndexData(index, table, dataMutation, ptr, builder));
+            indexMutations.addAll(
+                generateIndexData(index, table, dataMutation, ptr, builder, context));
         }
         return indexMutations;
     }
 
     public static List<Mutation> generateIndexData(PTable indexTable, PTable dataTable,
-            Mutation dataMutation, ImmutableBytesWritable ptr, KeyValueBuilder builder)
+            Mutation dataMutation, ImmutableBytesWritable ptr, KeyValueBuilder builder,
+            ExpressionContext context)
             throws SQLException {
         byte[] dataRowKey = dataMutation.getRow();
         RowKeySchema dataRowKeySchema = dataTable.getRowKeySchema();
@@ -152,7 +155,7 @@ public class IndexTestUtil {
         PRow row;
         long ts = MetaDataUtil.getClientTimeStamp(dataMutation);
         if (dataMutation instanceof Delete && dataMutation.getFamilyCellMap().values().isEmpty()) {
-            indexTable.newKey(ptr, indexValues);
+            indexTable.newKey(ptr, indexValues, context);
             row = indexTable.newRow(builder, ts, ptr, false);
             row.delete();
         } else {
@@ -180,7 +183,7 @@ public class IndexTestUtil {
                     }
                 }
             }
-            indexTable.newKey(ptr, indexValues);
+            indexTable.newKey(ptr, indexValues, context);
             row = indexTable.newRow(builder, ts, ptr, false);
             int pos = 0;
             while ((pos = indexValuesSet.nextSetBit(pos)) >= 0) {

@@ -43,10 +43,12 @@ import org.apache.hadoop.hbase.wal.WALKeyImpl;
 import org.apache.phoenix.end2end.ParallelStatsDisabledIT;
 import org.apache.phoenix.end2end.ParallelStatsDisabledTest;
 import org.apache.phoenix.hbase.index.wal.IndexedKeyValue;
+import org.apache.phoenix.jdbc.PhoenixConnection;
 import org.apache.phoenix.jdbc.PhoenixDatabaseMetaData;
 import org.apache.phoenix.mapreduce.util.ConnectionUtil;
 import org.apache.phoenix.schema.PTable;
 import org.apache.phoenix.util.ByteUtil;
+import org.apache.phoenix.util.ExpressionContextFactory;
 import org.apache.phoenix.util.PhoenixRuntime;
 import org.apache.phoenix.util.ReadOnlyProps;
 import org.apache.phoenix.util.TestUtil;
@@ -266,7 +268,7 @@ public class SystemCatalogWALEntryFilterIT extends ParallelStatsDisabledIT {
     tenantKeyParts[3] = Bytes.toBytes(VIEW_COLUMN_NAME);
     tenantKeyParts[4] = VIEW_COLUMN_FAMILY_BYTES;
     ImmutableBytesWritable key = new ImmutableBytesWritable();
-    catalogTable.newKey(key, tenantKeyParts);
+    catalogTable.newKey(key, tenantKeyParts, ExpressionContextFactory.getGMTServerSide());
     //the backing byte array of key might have extra space at the end.
     // need to just slice "the good parts" which we do by calling copyBytes
     return new Get(key.copyBytes());
@@ -280,7 +282,7 @@ public class SystemCatalogWALEntryFilterIT extends ParallelStatsDisabledIT {
     tenantKeyParts[3] = tenantId;
     tenantKeyParts[4] = Bytes.toBytes(SCHEMA_NAME + "." +viewName.toUpperCase());;
     ImmutableBytesWritable key = new ImmutableBytesWritable();
-    catalogTable.newKey(key, tenantKeyParts);
+    catalogTable.newKey(key, tenantKeyParts, ExpressionContextFactory.getGMTServerSide());
     //the backing byte array of key might have extra space at the end.
     // need to just slice "the good parts" which we do by calling copyBytes
     return new Get(key.copyBytes());

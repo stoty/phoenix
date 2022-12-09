@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.hadoop.hbase.CompareOperator;
 import org.apache.phoenix.expression.function.CeilDecimalExpression;
 import org.apache.phoenix.expression.function.CeilTimestampExpression;
-import org.apache.phoenix.expression.function.FloorDateExpression;
 import org.apache.phoenix.expression.function.FloorDecimalExpression;
 import org.apache.phoenix.expression.function.FloorTimestampExpression;
 import org.apache.phoenix.expression.function.TimeUnit;
@@ -40,8 +39,8 @@ import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.schema.types.PDecimal;
 import org.apache.phoenix.schema.types.PTimestamp;
 import org.apache.phoenix.schema.types.PUnsignedTimestamp;
-
 import org.apache.phoenix.thirdparty.com.google.common.collect.Lists;
+import org.apache.phoenix.util.ExpressionContext;
 
 /**
  * 
@@ -52,7 +51,24 @@ import org.apache.phoenix.thirdparty.com.google.common.collect.Lists;
  * @since 0.1
  */
 public abstract class BaseExpression implements Expression {
-    
+
+    // TODO we don't need the context in every node.
+    // Is storing the expression only where it is really needed worthwhile (8 bytes/node) ?
+    protected ExpressionContext context;
+
+    @Override
+    public ExpressionContext getContext() {
+        return context;
+    }
+
+    @Override
+    public  void setContext(ExpressionContext context) {
+        this.context = context;
+        for (Expression child : getChildren()) {
+            child.setContext(context);
+        }
+    }
+
     public static interface ExpressionComparabilityWrapper {
         public Expression wrap(Expression lhs, Expression rhs, boolean rowKeyOrderOptimizable) throws SQLException;
     }
@@ -213,6 +229,11 @@ public abstract class BaseExpression implements Expression {
 
     @Override
     public void readFields(DataInput input) throws IOException {
+    }
+
+    public void readFields(DataInput in, ExpressionContext context) throws IOException {
+        readFields(in);
+        setContext(context);
     }
 
     @Override

@@ -23,6 +23,7 @@ option java_generate_equals_and_hash = true;
 option optimize_for = SPEED;
 
 import "ServerCacheFactory.proto";
+import "Property.proto";
 
 message ImmutableBytesWritable {
   required bytes byteArray = 1;
@@ -93,6 +94,7 @@ message TransformMaintainer {
   optional string logicalNewTableName = 20;
   optional int32 oldTableEncodingScheme = 21;
   optional int32 oldTableImmutableStorageScheme = 22;
+  repeated Property contextParams = 23;
 }
 
 message AddServerCacheRequest {

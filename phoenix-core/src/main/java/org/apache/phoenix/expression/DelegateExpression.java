@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.phoenix.expression.visitor.ExpressionVisitor;
 import org.apache.phoenix.schema.types.PDataType;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.schema.SortOrder;
 import org.apache.phoenix.schema.tuple.Tuple;
 
@@ -63,6 +64,11 @@ public class DelegateExpression implements Expression {
     @Override
     public void readFields(DataInput input) throws IOException {
         delegate.readFields(input);
+    }
+
+    @Override
+    public void readFields(DataInput in, ExpressionContext context) throws IOException {
+        delegate.readFields(in, context);
     }
 
     @Override
@@ -108,6 +114,16 @@ public class DelegateExpression implements Expression {
     @Override
     public boolean isCloneExpression() {
         return delegate.isCloneExpression();
+    }
+
+    @Override
+    public ExpressionContext getContext() {
+        return delegate.getContext();
+    }
+
+    @Override
+    public void setContext(ExpressionContext context) {
+        delegate.setContext(context);
     }
 
 }

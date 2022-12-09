@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.phoenix.coprocessor.generated.MetaDataProtos.Property;
+import org.apache.phoenix.coprocessor.generated.PropertyProtos;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.query.QueryServicesOptions;
 
@@ -61,9 +61,9 @@ public class ExpressionContextFactory {
             timezoneOverride);
     }
 
-    public static ExpressionContext fromProtobuf(List<Property> protoProps) {
+    public static ExpressionContext fromProtobuf(List<PropertyProtos.Property> protoProps) {
         Map<String, String> propsMap = new HashMap<String, String>();
-        for (Property protoProp : protoProps) {
+        for (PropertyProtos.Property protoProp : protoProps) {
             propsMap.put(protoProp.getKey(), protoProp.getValue());
         }
         return get(new ReadOnlyProps(propsMap));

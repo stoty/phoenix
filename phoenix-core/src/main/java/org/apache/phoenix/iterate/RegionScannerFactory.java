@@ -145,7 +145,7 @@ public abstract class RegionScannerFactory {
                       ByteArrayInputStream stream = new ByteArrayInputStream(expBytes);
                       DataInputStream input = new DataInputStream(stream);
                       extraWhere = ExpressionType.values()[WritableUtils.readVInt(input)].newInstance();
-                      extraWhere.readFields(input);
+                      extraWhere.readFields(input, ScanUtil.getExpressionContext(scan));
                   } catch (IOException io) {
                       // should not happen since we're reading from a byte[]
                       throw new RuntimeException(io);

@@ -101,8 +101,11 @@ public class HashCacheFactory implements ServerCacheFactory {
                 for (int i = 0; i < nExprs; i++) {
                     int expressionOrdinal = WritableUtils.readVInt(dataInput);
                     Expression expression = ExpressionType.values()[expressionOrdinal].newInstance();
+                    // FIXME How do we handle the different possible Expression Contexts ?
+                    // 1. Add the ExpressionContext to the Key
+                    // 2. Use forceProjection = no ?
                     expression.readFields(dataInput);
-                    onExpressions.add(expression);                        
+                    onExpressions.add(expression);
                 }
                 boolean singleValueOnly = false;
                 int exprSizeAndSingleValueOnly = dataInput.readInt();

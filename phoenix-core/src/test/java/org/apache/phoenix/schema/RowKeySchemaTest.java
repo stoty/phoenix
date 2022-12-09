@@ -38,6 +38,7 @@ import org.apache.phoenix.query.BaseConnectionlessQueryTest;
 import org.apache.phoenix.query.KeyRange;
 import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.util.ByteUtil;
+import org.apache.phoenix.util.ExpressionContext;
 import org.apache.phoenix.util.PhoenixRuntime;
 import org.apache.phoenix.util.SchemaUtil;
 import org.junit.Test;
@@ -152,14 +153,14 @@ public class RowKeySchemaTest  extends BaseConnectionlessQueryTest  {
         assertExpectedRowKeyValue("c1 VARCHAR, c2 CHAR(1) NOT NULL, c3 INTEGER NOT NULL", "c1, c2, c3", new Object[] {"abc", "z", 5});
     }
     
-    private static byte[] getKeyPart(PTable t, String... keys) throws SQLException {
+    private static byte[] getKeyPart(PTable t, ExpressionContext context, String... keys) throws SQLException {
         ImmutableBytesWritable ptr = new ImmutableBytesWritable();
         byte[][] keyByteArray = new byte[keys.length][];
         int i = 0;
         for (String key : keys) {
             keyByteArray[i++] = key == null ? ByteUtil.EMPTY_BYTE_ARRAY : Bytes.toBytes(key);
         }
-        t.newKey(ptr, keyByteArray);
+        t.newKey(ptr, keyByteArray, context);
         return ptr.copyBytes();
     }
     
@@ -167,6 +168,7 @@ public class RowKeySchemaTest  extends BaseConnectionlessQueryTest  {
     public void testClipLeft() throws Exception {
         ImmutableBytesWritable ptr = new ImmutableBytesWritable();
         Connection conn = DriverManager.getConnection(getUrl());
+        ExpressionContext context = ((PhoenixConnection)conn).getExpressionContext();
         conn.createStatement().execute("CREATE TABLE T1(K1 CHAR(1) NOT NULL, K2 VARCHAR, K3 VARCHAR, CONSTRAINT pk PRIMARY KEY (K1,K2,K3))  ");
         PhoenixConnection pconn = conn.unwrap(PhoenixConnection.class);
         PTable table;
@@ -174,25 +176,25 @@ public class RowKeySchemaTest  extends BaseConnectionlessQueryTest  {
         table = pconn.getTable(new PTableKey(pconn.getTenantId(), "T1"));
         schema = table.getRowKeySchema();
         KeyRange r, rLeft, expectedResult;
-        r = KeyRange.getKeyRange(getKeyPart(table, "A", "B", "C"), true, getKeyPart(table, "B", "C"), true);
+        r = KeyRange.getKeyRange(getKeyPart(table, context, "A", "B", "C"), true, getKeyPart(table, context, "B", "C"), true);
         rLeft = schema.clipLeft(0, r, 1, ptr);
-        expectedResult = KeyRange.getKeyRange(getKeyPart(table, "A"), true, getKeyPart(table, "B"), true);
-        r = KeyRange.getKeyRange(getKeyPart(table, "A", "B", "C"), true, getKeyPart(table, "B"), true);
+        expectedResult = KeyRange.getKeyRange(getKeyPart(table, context, "A"), true, getKeyPart(table, context, "B"), true);
+        r = KeyRange.getKeyRange(getKeyPart(table, context, "A", "B", "C"), true, getKeyPart(table, context, "B"), true);
         rLeft = schema.clipLeft(0, r, 1, ptr);
-        expectedResult = KeyRange.getKeyRange(getKeyPart(table, "A"), true, getKeyPart(table, "B"), true);
+        expectedResult = KeyRange.getKeyRange(getKeyPart(table, context, "A"), true, getKeyPart(table, context, "B"), true);
         assertEquals(expectedResult, rLeft);
         rLeft = schema.clipLeft(0, r, 2, ptr);
-        expectedResult = KeyRange.getKeyRange(getKeyPart(table, "A", "B"), true, getKeyPart(table, "B"), true);
+        expectedResult = KeyRange.getKeyRange(getKeyPart(table, context, "A", "B"), true, getKeyPart(table, context, "B"), true);
         assertEquals(expectedResult, rLeft);
         
-        r = KeyRange.getKeyRange(getKeyPart(table, "A", "B", "C"), true, KeyRange.UNBOUND, true);
+        r = KeyRange.getKeyRange(getKeyPart(table, context, "A", "B", "C"), true, KeyRange.UNBOUND, true);
         rLeft = schema.clipLeft(0, r, 2, ptr);
-        expectedResult = KeyRange.getKeyRange(getKeyPart(table, "A", "B"), true, KeyRange.UNBOUND, false);
+        expectedResult = KeyRange.getKeyRange(getKeyPart(table, context, "A", "B"), true, KeyRange.UNBOUND, false);
         assertEquals(expectedResult, rLeft);
         
-        r = KeyRange.getKeyRange(KeyRange.UNBOUND, false, getKeyPart(table, "A", "B", "C"), true);
+        r = KeyRange.getKeyRange(KeyRange.UNBOUND, false, getKeyPart(table, context, "A", "B", "C"), true);
         rLeft = schema.clipLeft(0, r, 2, ptr);
-        expectedResult = KeyRange.getKeyRange(KeyRange.UNBOUND, false, getKeyPart(table, "A", "B"), true);
+        expectedResult = KeyRange.getKeyRange(KeyRange.UNBOUND, false, getKeyPart(table, context, "A", "B"), true);
         assertEquals(expectedResult, rLeft);
     }
     

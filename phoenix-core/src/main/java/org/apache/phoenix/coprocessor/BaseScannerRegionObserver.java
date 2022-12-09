@@ -32,6 +32,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.coprocessor.ObserverContext;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 import org.apache.hadoop.hbase.coprocessor.RegionObserver;
+import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.io.TimeRange;
 import org.apache.hadoop.hbase.regionserver.FlushLifeCycleTracker;
@@ -50,6 +51,7 @@ import org.apache.hadoop.hbase.util.EnvironmentEdgeManager;
 import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
 import org.apache.phoenix.execute.TupleProjector;
+import org.apache.phoenix.filter.BooleanExpressionFilter;
 import org.apache.phoenix.filter.PagedFilter;
 import org.apache.phoenix.hbase.index.covered.update.ColumnReference;
 import org.apache.phoenix.index.IndexMaintainer;
@@ -257,6 +259,10 @@ abstract public class BaseScannerRegionObserver implements RegionObserver {
         if (txnScn!=null) {
             TimeRange timeRange = scan.getTimeRange();
             scan.setTimeRange(timeRange.getMin(), Bytes.toLong(txnScn));
+        }
+        Filter filter = scan.getFilter();
+        if (filter instanceof BooleanExpressionFilter) {
+            ((BooleanExpressionFilter)filter).setContext(ScanUtil.getExpressionContext(scan));
         }
         ThreadExpressionCtx.set(ScanUtil.getExpressionContext(scan));
         if (isRegionObserverFor(scan)) {

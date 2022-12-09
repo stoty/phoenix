@@ -45,10 +45,9 @@ import org.apache.phoenix.schema.types.PDataType.PDataCodec;
 import org.apache.phoenix.schema.types.PDate;
 import org.apache.phoenix.schema.types.PInteger;
 import org.apache.phoenix.schema.types.PVarchar;
-import org.apache.phoenix.util.ByteUtil;
-import org.apache.phoenix.util.GMTExpressionContext;
-import org.apache.phoenix.util.ThreadExpressionCtx;
 import org.apache.phoenix.thirdparty.com.google.common.collect.Lists;
+import org.apache.phoenix.util.ByteUtil;
+import org.apache.phoenix.util.ThreadExpressionCtx;
 
 /**
  * Function used to bucketize date/time values by rounding them to

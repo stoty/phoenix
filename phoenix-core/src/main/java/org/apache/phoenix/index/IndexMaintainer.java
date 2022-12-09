@@ -109,6 +109,8 @@ import org.apache.phoenix.transaction.PhoenixTransactionProvider.Feature;
 import org.apache.phoenix.util.BitSet;
 import org.apache.phoenix.util.ByteUtil;
 import org.apache.phoenix.util.EncodedColumnsUtil;
+import org.apache.phoenix.util.ExpressionContext;
+import org.apache.phoenix.util.ExpressionContextFactory;
 import org.apache.phoenix.util.ExpressionContextWrapper;
 import org.apache.phoenix.util.ExpressionUtil;
 import org.apache.phoenix.util.IndexUtil;
@@ -145,7 +147,10 @@ public class IndexMaintainer implements Writable, Iterable<ColumnReference> {
 
     private static final int EXPRESSION_NOT_PRESENT = -1;
     private static final int ESTIMATED_EXPRESSION_SIZE = 8;
-    
+
+    //Using the client epxressionContext for functional indexes would yield inconistent results 
+    private static ExpressionContext gmtExpressionContext = ExpressionContextFactory.getGMTServerSide();
+
     public static IndexMaintainer create(PTable dataTable, PTable index, PhoenixConnection connection) {
         if (dataTable.getType() == PTableType.INDEX || index.getType() != PTableType.INDEX || !dataTable.getIndexes().contains(index)) {
             throw new IllegalArgumentException();
@@ -1528,10 +1533,11 @@ public class IndexMaintainer implements Writable, Iterable<ColumnReference> {
         
         if (isNewClient) {
             int numIndexedExpressions = WritableUtils.readVInt(input);
-            indexedExpressions = Lists.newArrayListWithExpectedSize(numIndexedExpressions);        
+            indexedExpressions = Lists.newArrayListWithExpectedSize(numIndexedExpressions);
             for (int i = 0; i < numIndexedExpressions; i++) {
                 Expression expression = ExpressionType.values()[WritableUtils.readVInt(input)].newInstance();
-                expression.readFields(input);
+                // FIXME maybe use some kind of default CompliantExpressionContext instead ?
+                expression.readFields(input, gmtExpressionContext);
                 indexedExpressions.add(expression);
             }
         }
@@ -1623,7 +1629,7 @@ public class IndexMaintainer implements Writable, Iterable<ColumnReference> {
             while (stream.available() > 0) {
                 int expressionOrdinal = WritableUtils.readVInt(input);
                 Expression expression = ExpressionType.values()[expressionOrdinal].newInstance();
-                expression.readFields(input);
+                expression.readFields(input, ExpressionContextFactory.getGMTServerSide());
                 maintainer.indexedExpressions.add(expression);
             }
         }

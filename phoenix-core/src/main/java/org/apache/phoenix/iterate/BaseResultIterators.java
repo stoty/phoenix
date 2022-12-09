@@ -1396,7 +1396,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
                                 }
                                 Long cacheId = ((HashJoinCacheNotFoundException)e2).getCacheId();
                                 ServerCache cache = caches.get(new ImmutableBytesPtr(Bytes.toBytes(cacheId)));
-                                if (cache .getCachePtr() != null) {
+                                if (cache.getCachePtr() != null) {
                                     if (!hashCacheClient.addHashCacheToServer(startKey, cache, plan.getTableRef().getTable())) {
                                         throw e2;
                                     }

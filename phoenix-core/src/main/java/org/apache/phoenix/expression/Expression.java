@@ -17,6 +17,8 @@
  */
 package org.apache.phoenix.expression;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
@@ -24,6 +26,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.phoenix.expression.visitor.ExpressionVisitor;
 import org.apache.phoenix.schema.PDatum;
 import org.apache.phoenix.schema.tuple.Tuple;
+import org.apache.phoenix.util.ExpressionContext;
 
 
 /**
@@ -34,7 +37,28 @@ import org.apache.phoenix.schema.tuple.Tuple;
  * @since 0.1
  */
 public interface Expression extends PDatum, Writable {
-	
+
+    /**
+     * @return the ExpressionContext
+     */
+    ExpressionContext getContext();
+
+    /**
+     * Set the ExpressionContext for this node, and recursively set it for all of its children
+     * 
+     * @param context
+     */
+    void setContext(ExpressionContext context);
+
+    /**
+     * Deserialize the expression, then set the ExpressionContext on it recursively
+     * 
+     * @param in serialized Expression
+     * @param context ExpressionContext
+     * @throws IOException
+     */
+    void readFields(DataInput in, ExpressionContext context) throws IOException;
+
     /**
      * Access the value by setting a pointer to it (as opposed to making
      * a copy of it which can be expensive)

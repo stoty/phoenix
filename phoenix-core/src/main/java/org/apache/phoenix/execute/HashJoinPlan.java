@@ -499,7 +499,7 @@ public class HashJoinPlan extends DelegateQueryPlan {
         }
     }
     
-    public static class HashSubPlan implements SubPlan {        
+    public static class HashSubPlan implements SubPlan {
         private final int index;
         private final QueryPlan plan;
         private final List<Expression> hashExpressions;
