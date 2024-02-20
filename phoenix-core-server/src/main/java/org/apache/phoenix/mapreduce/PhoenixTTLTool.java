@@ -309,6 +309,7 @@ public class PhoenixTTLTool extends Configured implements Tool {
             printHelpAndExit(e.getMessage(), getOptions());
             return -1;
         } finally {
+            // TODO use try-with-resources
             if (connection != null) {
                 connection.close();
             }
