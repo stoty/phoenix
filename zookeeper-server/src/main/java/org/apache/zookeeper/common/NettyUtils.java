@@ -28,9 +28,13 @@ import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.internal.StringUtil;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.concurrent.ThreadFactory;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -48,6 +52,18 @@ public class NettyUtils {
     private static final int DEFAULT_INET_ADDRESS_COUNT = 1;
 
     /**
+     * Returns a ThreadFactory which generates daemon threads, and uses
+     * the passed class's name to generate the thread names.
+     *
+     * @param clazz Class to use for generating thread names
+     * @return Netty DefaultThreadFactory configured to create daemon threads
+     */
+    private static ThreadFactory createThreadFactory(Class<? extends Object> clazz) {
+        String poolName = "zkNetty" + StringUtil.simpleClassName(clazz);
+        return new DefaultThreadFactory(poolName, true);
+    }
+
+    /**
      * If {@link Epoll#isAvailable()} <code>== true</code>, returns a new
      * {@link EpollEventLoopGroup}, otherwise returns a new
      * {@link NioEventLoopGroup}. Creates the event loop group using the
@@ -56,9 +72,9 @@ public class NettyUtils {
      */
     public static EventLoopGroup newNioOrEpollEventLoopGroup() {
         if (Epoll.isAvailable()) {
-            return new EpollEventLoopGroup();
+            return new EpollEventLoopGroup(createThreadFactory(EpollEventLoopGroup.class));
         } else {
-            return new NioEventLoopGroup();
+            return new NioEventLoopGroup(createThreadFactory(NioEventLoopGroup.class));
         }
     }
 
@@ -72,9 +88,9 @@ public class NettyUtils {
      */
     public static EventLoopGroup newNioOrEpollEventLoopGroup(int nThreads) {
         if (Epoll.isAvailable()) {
-            return new EpollEventLoopGroup(nThreads);
+            return new EpollEventLoopGroup(nThreads, createThreadFactory(EpollEventLoopGroup.class));
         } else {
-            return new NioEventLoopGroup(nThreads);
+            return new NioEventLoopGroup(nThreads, createThreadFactory(NioEventLoopGroup.class));
         }
     }
 
