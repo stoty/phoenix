@@ -441,7 +441,7 @@
         </executions>
       </plugin>
     </plugins>
-    <sourceDirectory>set/in/profiles/by/build-helper-plugin</sourceDirectory>
+    <sourceDirectory>${actualSourceDirectory}</sourceDirectory>
   </build>
   <profiles>
     <profile>
@@ -453,6 +453,9 @@
           <value>!3.0</value>
         </property>
       </activation>
+      <properties>
+      <actualSourceDirectory>src/main/java</actualSourceDirectory>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.apache.hbase</groupId>
@@ -469,18 +472,18 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
             <executions>
-              <execution>
-                <id>add-source</id>
-                <goals>
-                  <goal>add-source</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <sources>
-                    <source>${basedir}/src/main/java</source>
-                  </sources>
-                </configuration>
-              </execution>
+<!--              <execution>-->
+<!--                <id>add-source</id>-->
+<!--                <goals>-->
+<!--                  <goal>add-source</goal>-->
+<!--                </goals>-->
+<!--                <phase>generate-sources</phase>-->
+<!--                <configuration>-->
+<!--                  <sources>-->
+<!--                    <source>${basedir}/src/main/java</source>-->
+<!--                  </sources>-->
+<!--                </configuration>-->
+<!--              </execution>-->
               <execution>
                 <id>add-antlr-source</id>
                 <goals>
@@ -494,32 +497,32 @@
                   </sources>
                 </configuration>
               </execution>
-              <execution>
-                <id>add-it-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <sources>
-                    <source>${basedir}/src/it/java</source>
-                  </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-it-resource</id>
-                <goals>
-                  <goal>add-test-resource</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${basedir}/src/it/resources</directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
+<!--              <execution>-->
+<!--                <id>add-it-source</id>-->
+<!--                <goals>-->
+<!--                  <goal>add-test-source</goal>-->
+<!--                </goals>-->
+<!--                <phase>generate-sources</phase>-->
+<!--                <configuration>-->
+<!--                  <sources>-->
+<!--                    <source>${basedir}/src/it/java</source>-->
+<!--                  </sources>-->
+<!--                </configuration>-->
+<!--              </execution>-->
+<!--              <execution>-->
+<!--                <id>add-it-resource</id>-->
+<!--                <goals>-->
+<!--                  <goal>add-test-resource</goal>-->
+<!--                </goals>-->
+<!--                <phase>generate-sources</phase>-->
+<!--                <configuration>-->
+<!--                  <resources>-->
+<!--                    <resource>-->
+<!--                      <directory>${basedir}/src/it/resources</directory>-->
+<!--                    </resource>-->
+<!--                  </resources>-->
+<!--                </configuration>-->
+<!--              </execution>-->
             </executions>
           </plugin>
         </plugins>
@@ -535,6 +538,8 @@
       </activation>
       <properties>
         <protoc.version>4.31.1</protoc.version>
+              <actualSourceDirectory>target/generated-sources/replaced/main/java</actualSourceDirectory>
+
       </properties>
       <build>
         <plugins>
@@ -624,18 +629,18 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
             <executions>
-              <execution>
-                <id>add-source</id>
-                <goals>
-                  <goal>add-source</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <sources>
-                    <source>${basedir}/target/generated-sources/replaced/main/java</source>
-                  </sources>
-                </configuration>
-              </execution>
+<!--              <execution>-->
+<!--                <id>add-source</id>-->
+<!--                <goals>-->
+<!--                  <goal>add-source</goal>-->
+<!--                </goals>-->
+<!--                <phase>generate-sources</phase>-->
+<!--                <configuration>-->
+<!--                  <sources>-->
+<!--                    <source>${basedir}/target/generated-sources/replaced/main/java</source>-->
+<!--                  </sources>-->
+<!--                </configuration>-->
+<!--              </execution>-->
               <execution>
                 <id>add-antlr-source</id>
                 <goals>
@@ -649,32 +654,32 @@
                   </sources>
                 </configuration>
               </execution>
-              <execution>
-                <id>add-it-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <sources>
-                    <source>${basedir}/target/generated-sources/replaced/it/java</source>
-                  </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-it-resource</id>
-                <goals>
-                  <goal>add-test-resource</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${basedir}/target/generated-sources/replaced/it/resources</directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
+<!--              <execution>-->
+<!--                <id>add-it-source</id>-->
+<!--                <goals>-->
+<!--                  <goal>add-test-source</goal>-->
+<!--                </goals>-->
+<!--                <phase>generate-sources</phase>-->
+<!--                <configuration>-->
+<!--                  <sources>-->
+<!--                    <source>${basedir}/target/generated-sources/replaced/it/java</source>-->
+<!--                  </sources>-->
+<!--                </configuration>-->
+<!--              </execution>-->
+<!--              <execution>-->
+<!--                <id>add-it-resource</id>-->
+<!--                <goals>-->
+<!--                  <goal>add-test-resource</goal>-->
+<!--                </goals>-->
+<!--                <phase>generate-sources</phase>-->
+<!--                <configuration>-->
+<!--                  <resources>-->
+<!--                    <resource>-->
+<!--                      <directory>${basedir}/target/generated-sources/replaced/it/resources</directory>-->
+<!--                    </resource>-->
+<!--                  </resources>-->
+<!--                </configuration>-->
+<!--              </execution>-->
             </executions>
           </plugin>
         </plugins>
