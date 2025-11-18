@@ -93,7 +93,7 @@ public class StatementContext {
   private boolean hasRawRowSizeFunction = false;
 
   public StatementContext(PhoenixStatement statement) {
-    this(statement, new Scan());
+    this(statement, new Scan().setAllowPartialResults(true));
   }
 
   public StatementContext(StatementContext context) {
@@ -132,7 +132,7 @@ public class StatementContext {
    */
   public StatementContext(PhoenixStatement statement, boolean collectRequestLevelMetrics) {
     this(statement, FromCompiler.EMPTY_TABLE_RESOLVER, new BindManager(statement.getParameters()),
-      new Scan(), new SequenceManager(statement), collectRequestLevelMetrics);
+      new Scan().setAllowPartialResults(true), new SequenceManager(statement), collectRequestLevelMetrics);
   }
 
   public StatementContext(PhoenixStatement statement, Scan scan) {
@@ -141,7 +141,7 @@ public class StatementContext {
   }
 
   public StatementContext(PhoenixStatement statement, ColumnResolver resolver) {
-    this(statement, resolver, new BindManager(statement.getParameters()), new Scan(),
+    this(statement, resolver, new BindManager(statement.getParameters()), new Scan().setAllowPartialResults(true),
       new SequenceManager(statement));
   }
 

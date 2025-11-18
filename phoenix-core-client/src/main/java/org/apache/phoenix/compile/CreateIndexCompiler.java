@@ -244,7 +244,7 @@ public class CreateIndexCompiler {
     verifyDataTable(connection, create.getTable());
     final ColumnResolver resolver =
       FromCompiler.getResolverForCreateIndex(create, connection, create.getUdfParseNodes());
-    Scan scan = new Scan();
+    Scan scan = new Scan().setAllowPartialResults(true);
     final StatementContext context =
       new StatementContext(statement, resolver, scan, new SequenceManager(statement));
     verifyIndexWhere(create.getWhere(), context, create.getTable().getName());

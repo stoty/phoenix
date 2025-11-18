@@ -67,7 +67,7 @@ public class PostDDLCompiler {
   private final Scan scan;
 
   public PostDDLCompiler(PhoenixConnection connection) {
-    this(connection, new Scan());
+    this(connection, new Scan().setAllowPartialResults(true));
   }
 
   public PostDDLCompiler(PhoenixConnection connection, Scan scan) {

@@ -38,7 +38,7 @@ import org.apache.phoenix.util.EnvironmentEdgeManager;
  * already has a filter then PagingFilter wraps it. This filter is for server pagination. It makes
  * sure that the scan does not take more than pageSizeInMs. PagingRegionScanner initializes
  * PagingFilter before retrieving a row. The state of PagingFilter consists of three variables
- * startTime, isStopped, and currentCell. During this initialization, starTime is set to the current
+ * startTime, isStopped, and currentCell. During this initialization, startTime is set to the current
  * time, isStopped to false, and currentCell to null. PagingFilter implements the paging state
  * machine in three filter methods that are hasFilterRow(), filterAllRemaining(), and
  * filterRowKey(). These methods are called in the following order for each row: hasFilterRow(),

@@ -270,7 +270,7 @@ public class UpgradeUtil {
     int sizeBytes = 0;
     List<Mutation> mutations = Lists.newArrayListWithExpectedSize(10000);
 
-    Scan scan = new Scan();
+    Scan scan = new Scan().setAllowPartialResults(true);
     scan.setRaw(true);
     scan.readAllVersions();
     ResultScanner scanner = null;
@@ -788,7 +788,7 @@ public class UpgradeUtil {
         List<Mutation> mutations = Lists.newArrayListWithExpectedSize(10000);
 
         boolean success = false;
-        Scan scan = new Scan();
+        Scan scan = new Scan().setAllowPartialResults(true);
         scan.setRaw(true);
         scan.readAllVersions();
         Table seqTable =
@@ -1270,7 +1270,7 @@ public class UpgradeUtil {
       byte[] lastRowKey = null;
 
       do {
-        Scan scan = new Scan();
+        Scan scan = new Scan().setAllowPartialResults(true);
         scan.addFamily(DEFAULT_COLUMN_FAMILY_BYTES);
         // Push down the filter to hbase to avoid transfer
         SingleColumnValueFilter childLinkFilter =
@@ -1381,7 +1381,7 @@ public class UpgradeUtil {
       byte[] lastRowKey = null;
 
       do {
-        Scan scan = new Scan();
+        Scan scan = new Scan().setAllowPartialResults(true);
         scan.addFamily(DEFAULT_COLUMN_FAMILY_BYTES);
         // Push down the filter to hbase to avoid transfer
         SingleColumnValueFilter copyTTLFilter = new SingleColumnValueFilter(
@@ -1476,7 +1476,7 @@ public class UpgradeUtil {
       byte[] lastRowKey = null;
 
       do {
-        Scan scan = new Scan();
+        Scan scan = new Scan().setAllowPartialResults(true);
         scan.addFamily(DEFAULT_COLUMN_FAMILY_BYTES);
         // Push down the filter to hbase to avoid transfer
         QualifierFilter tableTypeQualifierFilter =
@@ -2528,7 +2528,7 @@ public class UpgradeUtil {
         .build(upgradePut);
       if (metaTable.checkAndMutate(checkAndMutate).isSuccess()) {
         List<Mutation> mutations = Lists.newArrayListWithExpectedSize(1000);
-        Scan scan = new Scan();
+        Scan scan = new Scan().setAllowPartialResults(true);
         scan.setRaw(true);
         scan.readAllVersions();
         ResultScanner statsScanner = statsTable.getScanner(scan);
@@ -3053,7 +3053,7 @@ public class UpgradeUtil {
   public static boolean isUpdateViewIndexIdColumnDataTypeFromShortToLongNeeded(
     PhoenixConnection metaConnection, byte[] rowKey, byte[] syscatBytes) {
     try (Table sysTable = metaConnection.getQueryServices().getTable(syscatBytes)) {
-      Scan s = new Scan();
+      Scan s = new Scan().setAllowPartialResults(true);
       s.setRowPrefixFilter(rowKey);
       s.addColumn(PhoenixDatabaseMetaData.TABLE_FAMILY_BYTES,
         PhoenixDatabaseMetaData.DATA_TYPE_BYTES);
