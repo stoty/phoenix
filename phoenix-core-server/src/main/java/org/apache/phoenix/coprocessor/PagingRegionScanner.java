@@ -188,10 +188,6 @@ public class PagingRegionScanner extends BaseRegionScanner {
     super(scanner);
     this.region = region;
     this.scan = scan;
-    if (!scan.getAllowPartialResults()) {
-      LOGGER.error("Scan without allowPartialResults in PagingRegionScanner. " + scan.toString(),
-        new Exception("Dummy exception to show stack trace"));
-    }
     pagingFilter = ScanUtil.getPhoenixPagingFilter(scan);
     pageSizeMs = ScanUtil.getPageSizeMsForRegionScanner(scan);
   }

@@ -106,7 +106,7 @@ public class CreateTableCompiler {
     PTableType type = create.getTableType();
     PTable parentToBe = null;
     ViewType viewTypeToBe = null;
-    Scan scan = new Scan().setAllowPartialResults(true);
+    Scan scan = new Scan().setNeedCursorResult(true);
     final StatementContext context =
       new StatementContext(statement, resolver, scan, new SequenceManager(statement));
     // TODO: support any statement for a VIEW instead of just a WHERE clause

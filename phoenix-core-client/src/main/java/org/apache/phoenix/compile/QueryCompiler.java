@@ -171,7 +171,7 @@ public class QueryCompiler {
     this.select = select;
     this.resolver = resolver;
     this.bindManager = bindManager;
-    this.scan = new Scan().setAllowPartialResults(true);
+    this.scan = new Scan().setNeedCursorResult(true);
     this.targetColumns = targetColumns;
     this.parallelIteratorFactory = parallelIteratorFactory;
     this.sequenceManager = sequenceManager;
@@ -370,7 +370,7 @@ public class QueryCompiler {
     Cost bestCost = null;
     for (JoinCompiler.Strategy strategy : strategies) {
       StatementContext newContext = new StatementContext(context.getStatement(),
-        context.getResolver(), context.getBindManager(), new Scan().setAllowPartialResults(true), context.getSequenceManager());
+        context.getResolver(), context.getBindManager(), new Scan().setNeedCursorResult(true), context.getSequenceManager());
       QueryPlan plan =
         compileJoinQuery(strategy, newContext, joinTable, asSubquery, projectPKColumns, orderBy);
       Cost cost = plan.getCost();

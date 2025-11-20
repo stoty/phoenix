@@ -60,7 +60,7 @@ public class ScanRanges {
     EVERYTHING_RANGES, KeyRange.EVERYTHING_RANGE, false, false, null, null);
   public static final ScanRanges NOTHING = new ScanRanges(null, ScanUtil.SINGLE_COLUMN_SLOT_SPAN,
     NOTHING_RANGES, KeyRange.EMPTY_RANGE, false, false, null, null);
-  private static final Scan HAS_INTERSECTION = new Scan().setAllowPartialResults(true);
+  private static final Scan HAS_INTERSECTION = new Scan().setNeedCursorResult(true);
 
   public static ScanRanges createPointLookup(List<KeyRange> keys) {
     return ScanRanges.create(SchemaUtil.VAR_BINARY_SCHEMA, Collections.singletonList(keys),
