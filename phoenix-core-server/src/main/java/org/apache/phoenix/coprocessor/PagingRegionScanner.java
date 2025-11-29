@@ -20,6 +20,7 @@ package org.apache.phoenix.coprocessor;
 import static org.apache.phoenix.query.QueryServices.USE_BLOOMFILTER_FOR_MULTIKEY_POINTLOOKUP;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.PackagePrivateFieldAccessor;
@@ -31,10 +32,11 @@ import org.apache.hadoop.hbase.regionserver.Region;
 import org.apache.hadoop.hbase.regionserver.RegionScanner;
 import org.apache.hadoop.hbase.regionserver.ScannerContext;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.phoenix.filter.PagingFilter;
+//import org.apache.phoenix.filter.PagingFilter;
 import org.apache.phoenix.filter.SkipScanFilter;
 import org.apache.phoenix.query.KeyRange;
 import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.util.EnvironmentEdgeManager;
 import org.apache.phoenix.util.ScanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +55,48 @@ import org.apache.phoenix.thirdparty.com.google.common.annotations.VisibleForTes
  * point lookup scan into N single point lookup scans to allow individual scan to leverage HBase
  * bloom filter. This conversion is done within the MultiKeyPointLookup inner class.
  */
+
+//FIXME update comment to indicate that this is now only used for the SkipScan Logic
+
 public class PagingRegionScanner extends BaseRegionScanner {
   private static final Logger LOGGER = LoggerFactory.getLogger(PagingRegionScanner.class);
   private Region region;
   private Scan scan;
-  private PagingFilter pagingFilter;
+//  private PagingFilter pagingFilter;
   private MultiKeyPointLookup multiKeyPointLookup = null;
   private boolean initialized = false;
   private long pageSizeMs;
 
+  private static Field limitField;
+  
+  static {
+    try {
+      Class<?> scannerContextClazz = Class.forName("org.apache.hadoop.hbase.regionserver.ScannerContext");
+      limitField = scannerContextClazz.getDeclaredField("limit");
+      limitField.setAccessible(true);
+    } catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (NoSuchFieldException | SecurityException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  private void setScannerContextLimitTime(ScannerContext sctx, long deadline) {
+    try {
+      limitField.set(sctx, deadline);
+    } catch (IllegalArgumentException | IllegalAccessException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  private void setScannerContextLimitDelta(ScannerContext sctx, long delta) {
+    //FIXME add checks
+    setScannerContextLimitDelta(sctx, EnvironmentEdgeManager.currentTimeMillis() + delta);
+  }
+  
   private class MultiKeyPointLookup {
     private SkipScanFilter skipScanFilter;
     private List<KeyRange> pointLookupRanges = null;
@@ -77,9 +112,9 @@ public class PagingRegionScanner extends BaseRegionScanner {
         System.arraycopy(scan.getStartRow(), 0, lookupKeyPrefix, 0, skipScanFilter.getOffset());
       }
       // A point lookup scan does not need to have a paging filter
-      if (pagingFilter != null) {
-        scan.setFilter(pagingFilter.getDelegateFilter());
-      }
+//      if (pagingFilter != null) {
+//        scan.setFilter(pagingFilter.getDelegateFilter());
+//      }
     }
 
     private int findLookupPosition(byte[] startRowKey) {
@@ -188,7 +223,7 @@ public class PagingRegionScanner extends BaseRegionScanner {
     super(scanner);
     this.region = region;
     this.scan = scan;
-    pagingFilter = ScanUtil.getPhoenixPagingFilter(scan);
+//    pagingFilter = ScanUtil.getPhoenixPagingFilter(scan);
     pageSizeMs = ScanUtil.getPageSizeMsForRegionScanner(scan);
   }
 
@@ -221,9 +256,9 @@ public class PagingRegionScanner extends BaseRegionScanner {
   private boolean next(List<Cell> results, boolean raw, ScannerContext scannerContext)
     throws IOException {
     init();
-    if (pagingFilter != null) {
-      pagingFilter.init();
-    }
+//    if (pagingFilter != null) {
+//      pagingFilter.init();
+//    }
     byte[] adjustedStartRowKey =
       scan.getAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY);
     byte[] adjustedStartRowKeyIncludeBytes =
@@ -272,34 +307,34 @@ public class PagingRegionScanner extends BaseRegionScanner {
     } else {
       hasMore = raw ? delegate.nextRaw(results) : delegate.next(results);
     }
-    if (pagingFilter == null) {
+//    if (pagingFilter == null) {
       return hasMore;
-    }
-    if (!hasMore) {
-      // There is no more row from the HBase region scanner. We need to check if
-      // PagingFilter has stopped the region scanner
-      if (pagingFilter.isStopped()) {
-        if (results.isEmpty()) {
-          byte[] rowKey = pagingFilter.getCurrentRowKeyToBeExcluded();
-          LOGGER.info("{} Paging filter stopped, generating dummy key {} ",
-            getRegionInfo().getRegionNameAsString(), Bytes.toStringBinary(rowKey));
-          ScanUtil.getDummyResult(rowKey, results);
-        } else {
-          // we got a valid result but page filter stopped set return immediately
-          PhoenixScannerContext.setReturnImmediately(scannerContext);
-        }
-        return true;
-      }
-      return false;
-    } else {
-      // We got a row from the HBase scanner within the configured time (i.e.,
-      // the page size).
-      if (PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)) {
-        // we got a valid result but scanner timed out so return immediately
-        PhoenixScannerContext.setReturnImmediately(scannerContext);
-      }
-      return true;
-    }
+//    }
+//    if (!hasMore) {
+//      // There is no more row from the HBase region scanner. We need to check if
+//      // PagingFilter has stopped the region scanner
+//      if (pagingFilter.isStopped()) {
+//        if (results.isEmpty()) {
+//          byte[] rowKey = pagingFilter.getCurrentRowKeyToBeExcluded();
+//          LOGGER.info("{} Paging filter stopped, generating dummy key {} ",
+//            getRegionInfo().getRegionNameAsString(), Bytes.toStringBinary(rowKey));
+//          ScanUtil.getDummyResult(rowKey, results);
+//        } else {
+//          // we got a valid result but page filter stopped set return immediately
+//          PhoenixScannerContext.setReturnImmediately(scannerContext);
+//        }
+//        return true;
+//      }
+//      return false;
+//    } else {
+//      // We got a row from the HBase scanner within the configured time (i.e.,
+//      // the page size).
+//      if (PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)) {
+//        // we got a valid result but scanner timed out so return immediately
+//        PhoenixScannerContext.setReturnImmediately(scannerContext);
+//      }
+//      return true;
+//    }
   }
 
   @Override

@@ -273,18 +273,23 @@ abstract public class BaseScannerRegionObserver implements RegionObserver {
         // happens if multiple coprocs (not scanners) are processing the scan like
         // UngroupedAggregateRegionObserver and GlobalIndexChecker
         phoenixScannerContext = (PhoenixScannerContext) scannerContext;
-      } else if (PhoenixScannerContext.isNewScanRpcRequest(scannerContext)) {
-        // An open scanner can process multiple scan rpcs during its lifetime.
-        // We need to create a new phoenix scanner context for every new scan rpc request.
-        phoenixScannerContext = new PhoenixScannerContext(scannerContext);
+      } else {
+        phoenixScannerContext = new PhoenixScannerContext(scannerContext, );
       }
+//      } else if (PhoenixScannerContext.isNewScanRpcRequest(scannerContext)) {
+//        // An open scanner can process multiple scan rpcs during its lifetime.
+//        // We need to create a new phoenix scanner context for every new scan rpc request.
+//        phoenixScannerContext = new PhoenixScannerContext(scannerContext);
+//      }
+        
       boolean res = isRaw
         ? super.nextRaw(result, phoenixScannerContext)
         : super.next(result, phoenixScannerContext);
-      if (!(scannerContext instanceof PhoenixScannerContext)) {
-        // only update the top level hbase scanner context
-        phoenixScannerContext.updateHBaseScannerContext(scannerContext, result);
-      }
+      //Not needed as we use delegates now 
+//      if (!(scannerContext instanceof PhoenixScannerContext)) {
+//        // only update the top level hbase scanner context
+//        phoenixScannerContext.updateHBaseScannerContext(scannerContext, result);
+//      }
       return res;
     }
 

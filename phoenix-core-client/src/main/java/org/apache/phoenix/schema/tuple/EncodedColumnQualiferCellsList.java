@@ -134,6 +134,7 @@ public class EncodedColumnQualiferCellsList implements List<Cell> {
     if (e == null) {
       throw new NullPointerException();
     }
+    //FIXME CURSOR
     if (isDummy(e)) {
       array[0] = e;
       firstNonNullElementIdx = 0;

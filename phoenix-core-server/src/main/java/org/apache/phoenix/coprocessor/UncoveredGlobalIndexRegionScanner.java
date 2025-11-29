@@ -119,7 +119,8 @@ public class UncoveredGlobalIndexRegionScanner extends UncoveredIndexRegionScann
     }
     try (ResultScanner resultScanner = dataHTable.getScanner(dataScan)) {
       for (Result result = resultScanner.next(); (result != null); result = resultScanner.next()) {
-        if (ScanUtil.isDummy(result)) {
+        //FIXME CURSOR
+        if (ScanUtil.isDummy(result) || result.isCursor()) {
           state = State.SCANNING_DATA_INTERRUPTED;
           break;
         }
