@@ -218,6 +218,10 @@ public class PhoenixScannerContext extends ScannerContext {
     //Reordered to start with timeLimit
     return checkTimeLimit(checkerScope) || checkSizeLimit(checkerScope) || checkBatchLimit(checkerScope);
   }
+
+  public static boolean checkAnyLimitReached(ScannerContext sc) {
+    return sc.checkAnyLimitReached(LimitScope.BETWEEN_ROWS);
+  }
   
   @Override
   Cell getLastPeekedCell() {
@@ -298,17 +302,17 @@ public class PhoenixScannerContext extends ScannerContext {
     this(hbaseContext);
     pageTimeDeadline = EnvironmentEdgeManager.currentTimeMillis() + pageSizeMsDelta;
   }
-  
+
   public PhoenixScannerContext(boolean trackMetrics) {
     super(false, null, trackMetrics);
     delegate = new ScannerContext(false, null, trackMetrics);
   }
 
-  /**
-   * Update the scanner context created by RSRpcServices so that it can act accordingly
-   * @param dst    hbase scanner context created on every new scan rpc request
-   * @param result list of cells to be returned to the client as scan rpc response
-   */
+//  /**
+//   * Update the scanner context created by RSRpcServices so that it can act accordingly
+//   * @param dst    hbase scanner context created on every new scan rpc request
+//   * @param result list of cells to be returned to the client as scan rpc response
+//   */
 //  public void updateHBaseScannerContext(ScannerContext dst, List<Cell> result) {
 //    if (dst == null) {
 //      return;

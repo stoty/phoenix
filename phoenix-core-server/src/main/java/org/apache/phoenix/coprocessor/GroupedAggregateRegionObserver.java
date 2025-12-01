@@ -538,6 +538,7 @@ public class GroupedAggregateRegionObserver extends BaseScannerRegionObserver
           // hbase client checks the last returned row by the server, gets the
           // rowkey and appends "\x00" byte, before resuming the scan. With this,
           // scan includeStartRowKey is set to true.
+          //FIXME HBase 3 does not seem to append a \x00 byte. Is this even true for 2.x ?
           // However, same is not the case with reverse scans. For the reverse scan,
           // hbase client checks the last returned row by the server, gets the
           // rowkey and treats it as startRowKey for resuming the scan. With this,
@@ -642,9 +643,7 @@ public class GroupedAggregateRegionObserver extends BaseScannerRegionObserver
               aggregators.aggregate(rowAggregators, result);
             }
             if (
-              hasMore && groupByCache.size() < limit
-                && (PhoenixScannerContext.isReturnImmediately(scannerContext)
-                  || PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs))
+              hasMore && groupByCache.size() < limit && PhoenixScannerContext.checkAnyLimitReached(scannerContext)
             ) {
               return getDummyResult(resultsToReturn);
             }

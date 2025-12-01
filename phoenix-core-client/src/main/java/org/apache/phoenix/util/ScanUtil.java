@@ -1662,6 +1662,8 @@ public class ScanUtil {
     return getPageSizeMs(scan, 0.6);
   }
 
+  // FIXME rename
+  // Not sure why the 0.3 / 0.6 split is necessary
   public static long getPageSizeMsForFilter(Scan scan) {
     return getPageSizeMs(scan, 0.3);
   }

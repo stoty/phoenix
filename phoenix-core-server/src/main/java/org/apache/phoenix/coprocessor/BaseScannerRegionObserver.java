@@ -52,7 +52,6 @@ import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
 import org.apache.phoenix.coprocessorclient.BaseScannerRegionObserverConstants;
 import org.apache.phoenix.execute.TupleProjector;
-import org.apache.phoenix.filter.PagingFilter;
 import org.apache.phoenix.hbase.index.covered.update.ColumnReference;
 import org.apache.phoenix.index.IndexMaintainer;
 import org.apache.phoenix.iterate.NonAggregateRegionScannerFactory;
@@ -177,13 +176,14 @@ abstract public class BaseScannerRegionObserver implements RegionObserver {
       ScanUtil.setupReverseScan(scan);
       // Set the paging filter. Make sure that the paging filter is the top level
       // filter if paging is enabled, that is pageSizeMsBytes != null.
-      if (!(scan.getFilter() instanceof PagingFilter)) {
-        byte[] pageSizeMsBytes =
-          scan.getAttribute(BaseScannerRegionObserverConstants.SERVER_PAGE_SIZE_MS);
-        if (pageSizeMsBytes != null) {
-          scan.setFilter(new PagingFilter(scan.getFilter(), getPageSizeMsForFilter(scan)));
-        }
-      }
+      //FIXME not using PagingFilter anymore
+//      if (!(scan.getFilter() instanceof PagingFilter)) {
+//        byte[] pageSizeMsBytes =
+//          scan.getAttribute(BaseScannerRegionObserverConstants.SERVER_PAGE_SIZE_MS);
+//        if (pageSizeMsBytes != null) {
+//          scan.setFilter(new PagingFilter(scan.getFilter(), getPageSizeMsForFilter(scan)));
+//        }
+//      }
     }
   }
 
@@ -274,7 +274,10 @@ abstract public class BaseScannerRegionObserver implements RegionObserver {
         // UngroupedAggregateRegionObserver and GlobalIndexChecker
         phoenixScannerContext = (PhoenixScannerContext) scannerContext;
       } else {
-        phoenixScannerContext = new PhoenixScannerContext(scannerContext, );
+        //FIXME I don't quite get the below comment. Do we need to care ?
+        // Seems like we'd have used a null scannerContext if neither *if* case evaluated to true.
+        // But the first if case would take care of subsequent calls in any case.
+        phoenixScannerContext = new PhoenixScannerContext(scannerContext, getPageSizeMsForFilter(scan));
       }
 //      } else if (PhoenixScannerContext.isNewScanRpcRequest(scannerContext)) {
 //        // An open scanner can process multiple scan rpcs during its lifetime.
