@@ -17,11 +17,6 @@
  */
 package org.apache.hadoop.hbase.regionserver;
 
-import static org.apache.phoenix.util.ScanUtil.isDummy;
-
-import java.util.List;
-import java.util.Map;
-
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.metrics.ServerSideScanMetrics;
 import org.apache.phoenix.util.EnvironmentEdgeManager;
@@ -38,6 +33,7 @@ public class PhoenixScannerContext extends ScannerContext {
 
   private final ScannerContext delegate;
   // Perf optimization to avoid having to call timeLimitReached from each nested scanner
+  //TODO is this worth it ?
   private boolean timeLimitCache = false;
   private long pageTimeDeadline = -1;
   
@@ -165,9 +161,9 @@ public class PhoenixScannerContext extends ScannerContext {
   }
 
   @Override
-  //FIXME same code as parent, no need to override
+  //Changed order to hopefully improve perf
   boolean hasAnyLimit(LimitScope checkerScope) {
-    return hasBatchLimit(checkerScope) || hasSizeLimit(checkerScope) || hasTimeLimit(checkerScope);
+    return hasTimeLimit(checkerScope) || hasBatchLimit(checkerScope) || hasSizeLimit(checkerScope) ;
   }
 
   @Override
@@ -218,7 +214,6 @@ public class PhoenixScannerContext extends ScannerContext {
   }
 
   @Override
-  //FIXME same code as parent, no need to override
   boolean checkAnyLimitReached(LimitScope checkerScope) {
     //Reordered to start with timeLimit
     return checkTimeLimit(checkerScope) || checkSizeLimit(checkerScope) || checkBatchLimit(checkerScope);
