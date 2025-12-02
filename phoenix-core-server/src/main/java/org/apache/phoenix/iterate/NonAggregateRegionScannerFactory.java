@@ -469,7 +469,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
             regionScannerContext.updateHBaseScannerContext(scannerContext, results);
             // we no longer need this context
             regionScannerContext = null;
-            if (PhoenixScannerContext.isReturnImmediately(scannerContext)) {
+            if (PhoenixScannerContext.checkAnyLimitReached(scannerContext)) {
               return true;
             }
           }
@@ -608,7 +608,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
             regionScannerContext.updateHBaseScannerContext(scannerContext, results);
             // we no longer need this context
             regionScannerContext = null;
-            if (PhoenixScannerContext.isReturnImmediately(scannerContext)) {
+            if (PhoenixScannerContext.checkAnyLimitReached(scannerContext)) {
               return true;
             }
           }

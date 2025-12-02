@@ -237,8 +237,7 @@ public class TTLRegionScanner extends BaseRegionScanner {
       Cell cell = result.get(0);
       result.clear();
       if (
-        PhoenixScannerContext.isReturnImmediately(scannerContext)
-          || PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
+        PhoenixScannerContext.checkAnyLimitReached(scannerContext)
       ) {
         ScanUtil.getDummyResult(CellUtil.cloneRow(cell), result);
         break;

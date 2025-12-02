@@ -223,6 +223,10 @@ public class PhoenixScannerContext extends ScannerContext {
     return sc.checkAnyLimitReached(LimitScope.BETWEEN_ROWS);
   }
   
+  public static Cell getLastPeekedCell(ScannerContext sc) {
+    return sc.getLastPeekedCell();
+  }
+  
   @Override
   Cell getLastPeekedCell() {
     return delegate.getLastPeekedCell();

@@ -232,8 +232,7 @@ public abstract class UncoveredIndexRegionScanner extends BaseRegionScanner {
         ) {
           result.clear();
           if (
-            PhoenixScannerContext.isReturnImmediately(scannerContext)
-              || PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
+              PhoenixScannerContext.checkAnyLimitReached(scannerContext)
           ) {
             byte[] rowKey = CellUtil.cloneRow(firstCell);
             ScanUtil.getDummyResult(rowKey, result);
@@ -274,8 +273,7 @@ public abstract class UncoveredIndexRegionScanner extends BaseRegionScanner {
         indexRows.add(row);
         indexRowCount++;
         if (
-          hasMore && (PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
-            || PhoenixScannerContext.isReturnImmediately(scannerContext))
+          hasMore && PhoenixScannerContext.checkAnyLimitReached(scannerContext)
         ) {
           getDummyResult(lastIndexRowKey, result);
           // We do not need to change the state, State.SCANNING_INDEX

@@ -278,8 +278,7 @@ public class GlobalIndexChecker extends BaseScannerRegionObserver implements Reg
             break;
           }
           if (
-            hasMore && (PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
-              || PhoenixScannerContext.isReturnImmediately(scannerContext))
+            hasMore && PhoenixScannerContext.checkAnyLimitReached(scannerContext)
           ) {
             byte[] rowKey = CellUtil.cloneRow(cell);
             result.clear();

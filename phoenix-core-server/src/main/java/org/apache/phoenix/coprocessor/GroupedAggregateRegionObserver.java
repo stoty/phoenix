@@ -835,8 +835,7 @@ public class GroupedAggregateRegionObserver extends BaseScannerRegionObserver
             // Do rowCount + 1 b/c we don't have to wait for a complete
             // row in the case of a DISTINCT with a LIMIT
             if (
-              PhoenixScannerContext.isReturnImmediately(scannerContext)
-                || PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
+              PhoenixScannerContext.checkAnyLimitReached(scannerContext)
             ) {
               pageTimeout = true;
               break;

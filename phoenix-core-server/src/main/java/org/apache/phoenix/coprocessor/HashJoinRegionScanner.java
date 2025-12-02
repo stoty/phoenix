@@ -322,8 +322,7 @@ public class HashJoinRegionScanner implements RegionScanner {
         Cell cell = result.get(0);
         processResults(result, false);
         if (
-          PhoenixScannerContext.isReturnImmediately(scannerContext)
-            || PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
+            PhoenixScannerContext.checkAnyLimitReached(scannerContext)
         ) {
           byte[] rowKey = CellUtil.cloneRow(cell);
           result.clear();

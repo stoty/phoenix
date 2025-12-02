@@ -648,7 +648,7 @@ public class UngroupedAggregateRegionScanner extends BaseRegionScanner {
               // we got a page timeout from the lower scanner but hasAny is true which means that
               // we have a valid result which we can return to the client instead of a dummy but we
               // still need to finish the rpc and release the handler
-              PhoenixScannerContext.setReturnImmediately(scannerContext);
+//              PhoenixScannerContext.setReturnImmediately(scannerContext);
               break;
             }
             if (!results.isEmpty()) {
@@ -703,12 +703,11 @@ public class UngroupedAggregateRegionScanner extends BaseRegionScanner {
               hasAny = true;
             }
             if (
-              PhoenixScannerContext.isReturnImmediately(scannerContext)
-                || PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)
+                PhoenixScannerContext.checkAnyLimitReached(scannerContext)
             ) {
               // we could have a valid result which we can return to the client instead of a dummy,
               // but we still need to finish the rpc and release the handler
-              PhoenixScannerContext.setReturnImmediately(scannerContext);
+              //PhoenixScannerContext.setReturnImmediately(scannerContext);
               break;
             }
           } while (hasMore);

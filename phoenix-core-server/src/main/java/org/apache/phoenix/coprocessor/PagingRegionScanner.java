@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.PackagePrivateFieldAccessor;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.TableDescriptor;
@@ -67,36 +68,6 @@ public class PagingRegionScanner extends BaseRegionScanner {
   private boolean initialized = false;
   private long pageSizeMs;
 
-  private static Field limitField;
-  
-  static {
-    try {
-      Class<?> scannerContextClazz = Class.forName("org.apache.hadoop.hbase.regionserver.ScannerContext");
-      limitField = scannerContextClazz.getDeclaredField("limit");
-      limitField.setAccessible(true);
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (NoSuchFieldException | SecurityException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
-  private void setScannerContextLimitTime(ScannerContext sctx, long deadline) {
-    try {
-      limitField.set(sctx, deadline);
-    } catch (IllegalArgumentException | IllegalAccessException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
-  private void setScannerContextLimitDelta(ScannerContext sctx, long delta) {
-    //FIXME add checks
-    setScannerContextLimitDelta(sctx, EnvironmentEdgeManager.currentTimeMillis() + delta);
-  }
-  
   private class MultiKeyPointLookup {
     private SkipScanFilter skipScanFilter;
     private List<KeyRange> pointLookupRanges = null;
@@ -168,6 +139,8 @@ public class PagingRegionScanner extends BaseRegionScanner {
       ScannerContext scannerContext) throws IOException {
       try {
         while (true) {
+          // hasMore is the result from the delegate scanner
+          // hasMore() depends on the state of MultiKeyPointLookup 
           boolean hasMore;
           if (scannerContext != null) {
             hasMore = raw
@@ -185,9 +158,10 @@ public class PagingRegionScanner extends BaseRegionScanner {
               "Each scan is supposed to return only one row, scan " + scan + ", region " + region);
           }
           if (!results.isEmpty()) {
-            if (PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)) {
+            if (PhoenixScannerContext.checkAnyLimitReached(scannerContext)) {
               // we got a valid result but scanner timed out so return immediately
-              PhoenixScannerContext.setReturnImmediately(scannerContext);
+              //PhoenixScannerContext.setReturnImmediately(scannerContext);
+              //NOOP, the Phoenix page logic is integrated into PhoenixScannerContext
             }
             return hasMore();
           }
@@ -197,7 +171,8 @@ public class PagingRegionScanner extends BaseRegionScanner {
             return false;
           }
 
-          if (PhoenixScannerContext.isTimedOut(scannerContext, pageSizeMs)) {
+          
+          if (PhoenixScannerContext.checkAnyLimitReached(scannerContext)) {
             byte[] rowKey = pointLookupRanges.get(lookupPosition - 1).getLowerRange();
             ScanUtil.getDummyResult(rowKey, results);
             return true;
@@ -308,8 +283,23 @@ public class PagingRegionScanner extends BaseRegionScanner {
       hasMore = raw ? delegate.nextRaw(results) : delegate.next(results);
     }
 //    if (pagingFilter == null) {
-      return hasMore;
-//    }
+//      return hasMore;
+//  }
+    // Here the cursor behaviour is very different from PagingFilter
+    // The hasMore result can be returned as is, but we still need to set the dummy row for now
+    if (hasMore && results.isEmpty()) {
+      byte[] rowKey = CellUtil.cloneRow(PhoenixScannerContext.getLastPeekedCell(scannerContext));
+      if (rowKey.length>0) {
+        ScanUtil.getDummyResult(rowKey, results);
+        return true;
+      } else {
+        // scanner hit limit without processing a single cell.
+        // This should not be possible
+        // FIXME really ?
+        throw new IOException("empty results and hasMore, but no peeked Cell");
+      }
+    }
+    return hasMore;
 //    if (!hasMore) {
 //      // There is no more row from the HBase region scanner. We need to check if
 //      // PagingFilter has stopped the region scanner
