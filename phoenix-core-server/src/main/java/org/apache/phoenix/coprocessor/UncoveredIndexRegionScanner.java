@@ -34,6 +34,7 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
+import org.apache.hadoop.hbase.HBaseIOException;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Mutation;
@@ -397,6 +398,9 @@ public abstract class UncoveredIndexRegionScanner extends BaseRegionScanner {
    */
   @Override
   public boolean next(List<Cell> result, ScannerContext scannerContext) throws IOException {
+    if (scannerContext == null) {
+      throw new HBaseIOException("BUG: scannerContext must not be null");
+    }
     long startTime = (scannerContext != null)
       ? ((PhoenixScannerContext) scannerContext).getStartTime()
       : EnvironmentEdgeManager.currentTimeMillis();

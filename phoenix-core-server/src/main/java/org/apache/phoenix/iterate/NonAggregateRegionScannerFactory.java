@@ -395,6 +395,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
     ) {
       iterator.setRowCountToOffset();
     }
+    // TODO is it worth doing this here ? It would be simpler to do this on first next(). 
     try {
       Tuple tuple = iterator.next();
       if (tuple == null && !isLastScan) {
@@ -447,6 +448,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
       private byte[] previousResultRowKey;
       // scanner context used when we are opening the scanner and skipping up to offset rows
       // We copy this context to the hbase rpc context on the first next call
+      //FIXME would be easier to perform the pre-processing on the first next() ?
       private PhoenixScannerContext regionScannerContext = sc;
 
       @Override
@@ -466,7 +468,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
             return false;
           }
           if (regionScannerContext != null) {
-            regionScannerContext.updateHBaseScannerContext(scannerContext, results);
+            regionScannerContext.updateScannerContext(scannerContext, results);
             // we no longer need this context
             regionScannerContext = null;
             if (PhoenixScannerContext.checkAnyLimitReached(scannerContext)) {
@@ -605,7 +607,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
             return false;
           }
           if (regionScannerContext != null) {
-            regionScannerContext.updateHBaseScannerContext(scannerContext, results);
+            regionScannerContext.updateScannerContext(scannerContext, results);
             // we no longer need this context
             regionScannerContext = null;
             if (PhoenixScannerContext.checkAnyLimitReached(scannerContext)) {

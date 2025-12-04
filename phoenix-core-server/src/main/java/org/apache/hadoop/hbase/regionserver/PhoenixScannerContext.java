@@ -17,6 +17,12 @@
  */
 package org.apache.hadoop.hbase.regionserver;
 
+import static org.apache.phoenix.util.ScanUtil.getPageSizeMsForRegionScanner;
+import static org.apache.phoenix.util.ScanUtil.isDummy;
+
+import java.util.List;
+import java.util.Map;
+
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.metrics.ServerSideScanMetrics;
 import org.apache.phoenix.util.EnvironmentEdgeManager;
@@ -36,7 +42,9 @@ public class PhoenixScannerContext extends ScannerContext {
   //TODO is this worth it ?
   private boolean timeLimitCache = false;
   private long pageTimeDeadline = -1;
-  
+  // tracks the start time of the rpc on the server for server paging
+  private final long startTime;
+
   @Override
   public boolean isTrackingMetrics() {
     return delegate.isTrackingMetrics();
@@ -268,7 +276,9 @@ public class PhoenixScannerContext extends ScannerContext {
     return sb.toString();
   }
 
-  
+  private void setPageTimeDeadline(long pageTimeDeadline) {
+    this.pageTimeDeadline = pageTimeDeadline;
+  }
 
   //FIXME
 //  static {
@@ -281,8 +291,11 @@ public class PhoenixScannerContext extends ScannerContext {
 //    }
 //  }
   
-  // tracks the start time of the rpc on the server for server paging
-//  private final long startTime;
+
+
+  public long getStartTime() {
+    return startTime;
+  }
 
   /**
    * The scanner remains open on the server during the course of multiple scan rpc requests. We need
@@ -298,6 +311,7 @@ public class PhoenixScannerContext extends ScannerContext {
   public PhoenixScannerContext(ScannerContext hbaseContext) {
     // Doesn't matter, everything goes through the delegate.
     super(false, null, false);
+    startTime = EnvironmentEdgeManager.currentTimeMillis();
     delegate = hbaseContext;
   }
 
@@ -307,38 +321,46 @@ public class PhoenixScannerContext extends ScannerContext {
     pageTimeDeadline = EnvironmentEdgeManager.currentTimeMillis() + pageSizeMsDelta;
   }
 
-  public PhoenixScannerContext(boolean trackMetrics) {
+  public PhoenixScannerContext(boolean trackMetrics, long pageSizeMsDelta) {
     super(false, null, trackMetrics);
+    startTime = EnvironmentEdgeManager.currentTimeMillis();
     delegate = new ScannerContext(false, null, trackMetrics);
+    pageTimeDeadline = EnvironmentEdgeManager.currentTimeMillis() + pageSizeMsDelta;
   }
 
-//  /**
-//   * Update the scanner context created by RSRpcServices so that it can act accordingly
-//   * @param dst    hbase scanner context created on every new scan rpc request
-//   * @param result list of cells to be returned to the client as scan rpc response
-//   */
-//  public void updateHBaseScannerContext(ScannerContext dst, List<Cell> result) {
-//    if (dst == null) {
-//      return;
-//    }
-//    // update last peeked cell
-//    dst.setLastPeekedCell(getLastPeekedCell());
-//    // update return immediately
-//    if (isDummy(result) || hasAnyLimit(LimitScope.BETWEEN_ROWS)) {
-//      // when a dummy row is returned by a lower layer, set returnImmediately
-//      // on the ScannerContext to force HBase to return a response to the client
-//      dst.returnImmediately();
-//    }
-//    // update metrics
-//    if (isTrackingMetrics() && dst.isTrackingMetrics()) {
-//      // getMetricsMap call resets the metrics internally
-//      for (Map.Entry<String, Long> entry : getMetrics().getMetricsMap().entrySet()) {
-//        dst.metrics.addToCounter(entry.getKey(), entry.getValue());
-//      }
-//    }
-//    // update progress
-//    dst.setProgress(getBatchProgress(), getDataSizeProgress(), getHeapSizeProgress());
-//  }
+  /**
+   * Update the scanner context created by RSRpcServices so that it can act accordingly
+   * @param dst    hbase scanner context created on every new scan rpc request
+   * @param result list of cells to be returned to the client as scan rpc response
+   */
+  public void updateScannerContext(ScannerContext dst, List<Cell> result) {
+    if (dst == null) {
+      return;
+    }
+    // update last peeked cell
+    dst.setLastPeekedCell(getLastPeekedCell());
+    // update return immediately
+    if (isDummy(result) || checkAnyLimitReached(LimitScope.BETWEEN_ROWS)) {
+      // when a dummy row is returned by a lower layer, set returnImmediately
+      // on the ScannerContext to force HBase to return a response to the client
+      dst.returnImmediately();
+    }
+    // update metrics
+    if (isTrackingMetrics() && dst.isTrackingMetrics()) {
+      // getMetricsMap call resets the metrics internally
+      for (Map.Entry<String, Long> entry : getMetrics().getMetricsMap().entrySet()) {
+        dst.metrics.addToCounter(entry.getKey(), entry.getValue());
+      }
+    }
+    // update progress
+    dst.setProgress(getBatchProgress(), getDataSizeProgress(), getHeapSizeProgress());
+    // update deadline
+    if(dst instanceof PhoenixScannerContext) {
+      ((PhoenixScannerContext)dst).setPageTimeDeadline(pageTimeDeadline);
+    } else {
+      LOGGER.error("Expected PhoenixScannerContext at", new Exception("For stack trace"));
+    }
+  }
 
   //FIXME remove or replace
 //  public static boolean isTimedOut(ScannerContext context, long pageSizeMs) {
