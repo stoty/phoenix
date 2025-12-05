@@ -185,7 +185,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
       // we need to create our own scanner context because we are still opening the scanner and
       // and don't have a rpc scanner context which is created in the next() call. This scanner
       // context is used when we are skipping the rows until we hit the offset
-      PhoenixScannerContext sc = new PhoenixScannerContext(scan.isScanMetricsEnabled());
+      PhoenixScannerContext sc = new PhoenixScannerContext(scan.isScanMetricsEnabled(), getPageSizeMsForRegionScanner(scan));
       iterator.setRegionScannerContext(sc);
       innerScanner = getOffsetScanner(innerScanner,
         new OffsetResultIterator(iterator, scanOffset, getPageSizeMsForRegionScanner(scan),
@@ -287,7 +287,7 @@ public class NonAggregateRegionScannerFactory extends RegionScannerFactory {
       // we need to create our own scanner context because we are still opening the scanner and
       // and don't have a rpc scanner context which is created in the next() call. This scanner
       // context is used when we are iterating over the top n rows before the first next() call
-      PhoenixScannerContext sc = new PhoenixScannerContext(scan.isScanMetricsEnabled());
+      PhoenixScannerContext sc = new PhoenixScannerContext(scan.isScanMetricsEnabled(), getPageSizeMsForRegionScanner(scan));
       inner.setRegionScannerContext(sc);
       OrderedResultIterator iterator = new OrderedResultIterator(inner, orderByExpressions,
         spoolingEnabled, thresholdBytes, limit >= 0 ? limit : null, null, estimatedRowSize,
