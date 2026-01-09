@@ -323,7 +323,7 @@ public class PhoenixQueryTimeoutIT extends ParallelStatsDisabledIT {
     }
 
     @Override
-    public void preScannerOpen(final ObserverContext<RegionCoprocessorEnvironment> c,
+    public void preScannerOpen(final ObserverContext c,
       final Scan scan) {
       try {
         Thread.sleep(delay);
