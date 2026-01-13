@@ -18,10 +18,12 @@
 package org.apache.phoenix.compat.hbase;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.hadoop.hbase.MetaTableAccessor;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.RegionInfo;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,4 +40,13 @@ public class CompatUtil {
     return MetaTableAccessor.getMergeRegions(conn, regionInfo);
   }
 
+  public static boolean isStartKeyWithExclusion(byte[] actualScanStartRowKey, boolean actualScanIncludeStartRowKey,
+      byte[] scanStartRowKey, boolean includeStartRowKey) {
+      if (!actualScanIncludeStartRowKey) {
+        LOGGER.warn("Start key was already excluded for actualScanStartRowKey: {} ", actualScanStartRowKey);
+      }
+      //This is dependent on the HBase 2.x sync implementation
+      return Bytes.compareTo(Arrays.copyOf(actualScanStartRowKey, actualScanStartRowKey.length + 1),
+        scanStartRowKey) == 0;
+    }
 }

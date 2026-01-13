@@ -37,6 +37,7 @@ import org.apache.hadoop.hbase.io.encoding.DataBlockEncoding;
 import org.apache.hadoop.hbase.io.hfile.HFileContext;
 import org.apache.hadoop.hbase.io.hfile.HFileContextBuilder;
 import org.apache.hadoop.hbase.regionserver.StoreUtils;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.ChecksumType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,5 +122,14 @@ public class CompatUtil {
 
   public static void closeAdminAndLog(Admin admin, Logger logger) {
     admin.close();
+  }
+
+  public static boolean isStartKeyWithExclusion(byte[] actualScanStartRowKey, boolean actualScanIncludeStartRowKey,
+    byte[] scanStartRowKey, boolean includeStartRowKey) {
+    if (!actualScanIncludeStartRowKey) {
+      LOGGER.warn("Start key was already excluded for actualScanStartRowKey: {} ", actualScanStartRowKey);
+    }
+    //This depends on the HBase 3 implementation, that handles exclusion natively
+    return !includeStartRowKey && Bytes.equals(actualScanStartRowKey, scanStartRowKey); 
   }
 }

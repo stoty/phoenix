@@ -32,6 +32,8 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.phoenix.compat.hbase.CompatUtil;
+import org.apache.phoenix.compat.hbase.HbaseCompatCapabilities;
 import org.apache.phoenix.compile.ExplainPlanAttributes.ExplainPlanAttributesBuilder;
 import org.apache.phoenix.coprocessorclient.BaseScannerRegionObserverConstants;
 import org.apache.phoenix.exception.PhoenixIOException;
@@ -317,27 +319,37 @@ public class OrderedResultIterator implements PeekingResultIterator {
             // If region has moved in the middle of the scan operation, after resetting
             // the scanner, hbase client uses (latest received rowkey + \x00) as new
             // start rowkey for resuming the scan operation on the new scanner.
-            if (
-              Bytes.compareTo(ByteUtil.concat(actualScanStartRowKey, ByteUtil.ZERO_BYTE),
-                scanStartRowKey) == 0
-            ) {
-              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY,
-                actualScanStartRowKey);
-              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY_INCLUDE,
-                Bytes.toBytes(actualScanIncludeStartRowKey));
-            } else {
-              // This happens when the server side scanner has already sent some
-              // rows back to the client and region has moved, so now we need to
-              // use skipValidRowsSent flag and also reset the scanner
-              // at paging region scanner level to re-read the previously sent
-              // values in order to re-compute the aggregation and then return
-              // only the next rowkey that was not yet sent back to the client.
+            
+            //TODO sync comments with GroupedaggregateRegionObserver
+            if(!CompatUtil.isStartKeyWithExclusion(actualScanStartRowKey, actualScanIncludeStartRowKey, scanStartRowKey, includeStartRowKey)) {
               skipValidRowsSent = true;
-              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY,
-                actualScanStartRowKey);
-              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY_INCLUDE,
-                Bytes.toBytes(actualScanIncludeStartRowKey));
             }
+            scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY,
+              actualScanStartRowKey);
+            scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY_INCLUDE,
+              Bytes.toBytes(actualScanIncludeStartRowKey));
+//            
+//            if (
+//              Bytes.compareTo(ByteUtil.concat(actualScanStartRowKey, ByteUtil.ZERO_BYTE),
+//                scanStartRowKey) == 0
+//            ) {
+//              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY,
+//                actualScanStartRowKey);
+//              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY_INCLUDE,
+//                Bytes.toBytes(actualScanIncludeStartRowKey));
+//            } else {
+//              // This happens when the server side scanner has already sent some
+//              // rows back to the client and region has moved, so now we need to
+//              // use skipValidRowsSent flag and also reset the scanner
+//              // at paging region scanner level to re-read the previously sent
+//              // values in order to re-compute the aggregation and then return
+//              // only the next rowkey that was not yet sent back to the client.
+//              skipValidRowsSent = true;
+//              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY,
+//                actualScanStartRowKey);
+//              scan.setAttribute(QueryServices.PHOENIX_PAGING_NEW_SCAN_START_ROWKEY_INCLUDE,
+//                Bytes.toBytes(actualScanIncludeStartRowKey));
+//            }
           }
         }
       }
@@ -369,7 +381,7 @@ public class OrderedResultIterator implements PeekingResultIterator {
           // scan includeStartRowKey is set to false.
           // Hence, we need to cover both cases here.
           if (Bytes.compareTo(resultRowKey, scanStartRowKey) == 0) {
-            // This can be true for reverse scan case.
+            // This can be true for reverse scan case on Hbase 2 and any scan on HBase 3
             skipValidRowsSent = false;
             if (includeStartRowKey) {
               return result;
@@ -377,10 +389,10 @@ public class OrderedResultIterator implements PeekingResultIterator {
             // If includeStartRowKey is false and the current rowkey is matching
             // with scanStartRowKey, return the next row result.
             return resultIterator.next();
-          } else if (
+          } else if (HbaseCompatCapabilities.BRANCH_2 && 
             Bytes.compareTo(ByteUtil.concat(resultRowKey, ByteUtil.ZERO_BYTE), scanStartRowKey) == 0
           ) {
-            // This can be true for regular scan case.
+            // This can be true for regular scan case on Hbase 2.
             skipValidRowsSent = false;
             if (includeStartRowKey) {
               // If includeStartRowKey is true and the (current rowkey + "\0xx") is
@@ -465,7 +477,7 @@ public class OrderedResultIterator implements PeekingResultIterator {
    */
   private void getDummyResult() {
     if (scanStartRowKey.length > 0 && !ScanUtil.isLocalIndex(scan)) {
-      if (
+      if ( HbaseCompatCapabilities.BRANCH_2 && // FIXME handle client/server version mismatch
         Bytes.compareTo(actualScanStartRowKey, scanStartRowKey) != 0
           || actualScanIncludeStartRowKey != includeStartRowKey
       ) {

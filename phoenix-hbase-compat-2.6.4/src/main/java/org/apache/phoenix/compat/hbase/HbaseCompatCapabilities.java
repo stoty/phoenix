@@ -18,6 +18,6 @@
 package org.apache.phoenix.compat.hbase;
 
 public class HbaseCompatCapabilities {
-  // Currently every supported HBase version has the same capabilities, so there is
-  // nothing in here.
+  public static final boolean BRANCH_2 = true;
+
 }

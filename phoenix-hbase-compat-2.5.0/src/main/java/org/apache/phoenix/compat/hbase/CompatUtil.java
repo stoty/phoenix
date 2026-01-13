@@ -18,6 +18,7 @@
 package org.apache.phoenix.compat.hbase;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.hadoop.hbase.MetaTableAccessor;
 import org.apache.hadoop.hbase.TableName;
@@ -32,9 +33,12 @@ import org.apache.hadoop.hbase.protobuf.ProtobufUtil;
 import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
 import org.apache.hadoop.hbase.protobuf.generated.ClientProtos.MutationProto;
 import org.apache.hadoop.hbase.protobuf.generated.ClientProtos.MutationProto.MutationType;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.protobuf.generated.TableProtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jdk.internal.org.jline.utils.Log;
 
 public class CompatUtil {
 
@@ -93,4 +97,15 @@ public class CompatUtil {
       logger.error("Closing the admin failed: ", e);
     }
   }
+
+  public static boolean isStartKeyWithExclusion(byte[] actualScanStartRowKey, boolean actualScanIncludeStartRowKey,
+      byte[] scanStartRowKey, boolean includeStartRowKey) {
+      if (!actualScanIncludeStartRowKey) {
+        LOGGER.warn("Start key was already excluded for actualScanStartRowKey: {} ", actualScanStartRowKey);
+      }
+      //This is dependent on the HBase 2.x sync implementation
+      return Bytes.compareTo(Arrays.copyOf(actualScanStartRowKey, actualScanStartRowKey.length + 1),
+        scanStartRowKey) == 0;
+    }
+
 }
