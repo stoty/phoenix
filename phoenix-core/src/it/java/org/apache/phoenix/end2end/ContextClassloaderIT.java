@@ -36,6 +36,7 @@ import java.sql.Statement;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.apache.phoenix.cache.ServerCacheClient;
 import org.apache.phoenix.jdbc.PhoenixTestDriver;
 import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.query.QueryServices;
@@ -43,9 +44,12 @@ import org.apache.phoenix.util.ReadOnlyProps;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Category(NeedsOwnMiniClusterTest.class)
 public class ContextClassloaderIT extends BaseTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ContextClassloaderIT.class);
 
   private static HBaseTestingUtility hbaseTestUtil;
   private static PhoenixTestDriver driver;
@@ -75,7 +79,7 @@ public class ContextClassloaderIT extends BaseTest {
   }
 
   protected static String getUrl() {
-    return "jdbc:phoenix:localhost:" + hbaseTestUtil.getZkCluster().getClientPort() + ";test=true";
+    return "jdbc:phoenix+zk:localhost:" + hbaseTestUtil.getZkCluster().getClientPort() + ";test=true";
   }
 
   @Test
@@ -173,6 +177,7 @@ public class ContextClassloaderIT extends BaseTest {
       try {
         target.run();
       } catch (Throwable t) {
+        LOGGER.error("XXXXX ",t);
         failed = true;
         throw new RuntimeException(t);
       }
