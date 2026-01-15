@@ -212,7 +212,7 @@ public class SkipSystemTablesExistenceCheckIT {
    * @return Phoenix connection string
    */
   private String getJdbcUrl() {
-    return "jdbc:phoenix:localhost:" + hbaseTestUtil.getZkCluster().getClientPort() + ":/hbase";
+    return "jdbc:phoenix+zk:localhost:" + hbaseTestUtil.getZkCluster().getClientPort() + ":/hbase";
   }
 
   /**
