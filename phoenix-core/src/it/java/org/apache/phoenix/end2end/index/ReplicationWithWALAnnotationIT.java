@@ -153,7 +153,7 @@ public class ReplicationWithWALAnnotationIT extends BaseTest {
     setUpConfigForMiniCluster(conf1);
 
     utility1 = new IntegrationTestingUtility(conf1);
-    utility1.startMiniZKCluster();
+    utility1.startMiniCluster(2);
 
     conf1 = utility1.getConfiguration();
     zkw1 = new ZKWatcher(conf1, "cluster1", null, true);
@@ -169,7 +169,6 @@ public class ReplicationWithWALAnnotationIT extends BaseTest {
     utility2.startMiniZKCluster();
     zkw2 = new ZKWatcher(conf2, "cluster2", null, true);
 
-    utility1.startMiniCluster(2);
     utility2.startMiniCluster(2);
 
     admin.addReplicationPeer("1",
