@@ -27,6 +27,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.hadoop.hbase.client.RetriesExhaustedException;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
 import org.apache.phoenix.exception.MutationBlockedIOException;
@@ -127,8 +130,7 @@ public class IndexRegionObserverMutationBlockingIT extends BaseTest {
         conn.commit();
         fail("Expected MutationBlockedIOException to be thrown");
       } catch (CommitException e) {
-        // Verify the exception chain contains MutationBlockedIOException
-        assertTrue("Expected MutationBlockedIOException in exception chain",
+        assertTrue("Expected MutationBlockedIOException in exception chain " + ExceptionUtils.getStackTrace(e),
           containsMutationBlockedException(e));
       }
     }
@@ -223,9 +225,12 @@ public class IndexRegionObserverMutationBlockingIT extends BaseTest {
 
   private boolean containsMutationBlockedException(CommitException e) {
     Throwable cause = e.getCause();
-    if (cause instanceof RetriesExhaustedWithDetailsException) {
+    if (cause instanceof RetriesExhaustedWithDetailsException ) { // HBase 2
       RetriesExhaustedWithDetailsException re = (RetriesExhaustedWithDetailsException) cause;
       return re.getCause(0) instanceof MutationBlockedIOException;
+    } else if (cause instanceof RetriesExhaustedException) { // HBase 3
+      RetriesExhaustedException re = (RetriesExhaustedException) cause;
+      return re.getCause() instanceof MutationBlockedIOException;
     }
     return false;
   }
