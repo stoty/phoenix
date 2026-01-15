@@ -52,7 +52,9 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
 import org.apache.hadoop.hbase.zookeeper.ZKWatcher;
 import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
+import org.apache.phoenix.jdbc.ConnectionInfo;
 import org.apache.phoenix.jdbc.PhoenixTestDriver;
+import org.apache.phoenix.jdbc.ZKConnectionInfo;
 import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.util.PropertiesUtil;
@@ -127,9 +129,10 @@ public class MutableIndexReplicationIT extends BaseTest {
     conf1.setLong(HConstants.THREAD_WAKE_FREQUENCY, 100);
     conf1.setInt("replication.stats.thread.period.seconds", 5);
     conf1.setBoolean("hbase.tests.use.shortcircuit.reads", false);
+    conf1.set(ConnectionInfo.CLIENT_CONNECTION_REGISTRY_IMPL_CONF_KEY, ZKConnectionInfo.ZK_REGISTRY_NAME);
 
     utility1 = new IntegrationTestingUtility(conf1);
-    utility1.startMiniZKCluster();
+    utility1.startMiniCluster();
     MiniZooKeeperCluster miniZK = utility1.getZkCluster();
     // Have to reset conf1 in case zk cluster location different
     // than default
@@ -144,13 +147,13 @@ public class MutableIndexReplicationIT extends BaseTest {
     conf2.setInt(HConstants.HBASE_CLIENT_RETRIES_NUMBER, 6);
     conf2.setBoolean("dfs.support.append", true);
     conf2.setBoolean("hbase.tests.use.shortcircuit.reads", false);
+    conf2.set(ConnectionInfo.CLIENT_CONNECTION_REGISTRY_IMPL_CONF_KEY, ZKConnectionInfo.ZK_REGISTRY_NAME);
 
     utility2 = new IntegrationTestingUtility(conf2);
     utility2.setZkCluster(miniZK);
     zkw2 = new ZKWatcher(conf2, "cluster2", null, true);
 
     LOGGER.info("Setup second Zk");
-    utility1.startMiniCluster(2);
     utility2.startMiniCluster(2);
     // replicate from cluster 1 -> cluster 2, but not back again
     admin.addReplicationPeer("1",
