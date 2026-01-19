@@ -67,8 +67,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HConstants;
+import org.apache.hadoop.hbase.client.RetriesExhaustedException;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.util.VersionInfo;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -386,7 +388,7 @@ public class ParallelPhoenixConnectionIT {
       doTestBasicOperationsWithConnection(conn, tableName, haGroupName);
       fail("Expected MutationBlockedIOException to be thrown");
     } catch (SQLException e) {
-      assertTrue(containsMutationBlockedException(e));
+      assertTrue("Expected MutationBlockedIOException in exception chain " + ExceptionUtils.getStackTrace(e), containsMutationBlockedException(e));
     } finally {
       CLUSTERS.transitClusterRole(haGroup, ClusterRole.ACTIVE, ClusterRole.STANDBY);
     }
@@ -426,11 +428,21 @@ public class ParallelPhoenixConnectionIT {
     Throwable cause = e.getCause();
     // Recursively check for MutationBlockedIOException buried in exception stack.
     while (cause != null) {
-      if (cause instanceof RetriesExhaustedWithDetailsException) {
+      if (cause instanceof RetriesExhaustedWithDetailsException) { // HBase 2
         RetriesExhaustedWithDetailsException re = (RetriesExhaustedWithDetailsException) cause;
         return re.getCause(0) instanceof MutationBlockedIOException;
+      } else { // HBase 3
+        for(Throwable suppressed : e.getSuppressed()) {
+          if (suppressed instanceof MutationBlockedIOException){
+            return true;
+          }
+          while ((suppressed = suppressed.getCause())!=null) {
+            if (suppressed instanceof MutationBlockedIOException){
+              return true;
+            }
+          }
+        }
       }
-      cause = cause.getCause();
     }
     return false;
   }
