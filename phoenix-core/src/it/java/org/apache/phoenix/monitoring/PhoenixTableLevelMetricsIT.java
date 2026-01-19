@@ -111,6 +111,7 @@ import org.apache.hadoop.hbase.DoNotRetryIOException;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HRegionLocation;
+import org.apache.hadoop.hbase.client.RetriesExhaustedException;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
 import org.apache.phoenix.end2end.ServerMetadataCacheTestImpl;
@@ -878,7 +879,7 @@ public class PhoenixTableLevelMetricsIT extends BaseTest {
     } catch (CommitException e) {
       Throwable retriesExhaustedEx = null;
       for (Throwable t = e.getCause(); t != null; t = t.getCause()) {
-        if (t instanceof RetriesExhaustedWithDetailsException) {
+        if (t instanceof RetriesExhaustedWithDetailsException || t instanceof RetriesExhaustedException) {
           retriesExhaustedEx = t;
           break;
         }
@@ -928,7 +929,7 @@ public class PhoenixTableLevelMetricsIT extends BaseTest {
       } catch (CommitException e) {
         Throwable retriesExhaustedEx = null;
         for (Throwable t = e.getCause(); t != null; t = t.getCause()) {
-          if (t instanceof RetriesExhaustedWithDetailsException) {
+          if (t instanceof RetriesExhaustedWithDetailsException || t instanceof RetriesExhaustedException) {
             retriesExhaustedEx = t;
             break;
           }
@@ -1258,7 +1259,7 @@ public class PhoenixTableLevelMetricsIT extends BaseTest {
       } catch (CommitException e) {
         Throwable retriesExhaustedEx = null;
         for (Throwable t = e.getCause(); t != null; t = t.getCause()) {
-          if (t instanceof RetriesExhaustedWithDetailsException) {
+          if (t instanceof RetriesExhaustedWithDetailsException || t instanceof RetriesExhaustedException) {
             retriesExhaustedEx = t;
             break;
           }
