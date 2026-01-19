@@ -97,6 +97,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.hadoop.metrics2.AbstractMetric;
+import org.apache.phoenix.compat.hbase.HbaseCompatCapabilities;
 import org.apache.phoenix.compile.StatementContext;
 import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
 import org.apache.phoenix.exception.SQLExceptionCode;
@@ -213,7 +214,10 @@ public class PhoenixMetricsIT extends BasePhoenixMetricsIT {
     assertTrue(GLOBAL_TASK_EXECUTION_TIME.getMetric().getValue() > 0);
 
     assertTrue(GLOBAL_HBASE_COUNT_RPC_CALLS.getMetric().getValue() > 0);
-    assertTrue(GLOBAL_HBASE_COUNT_MILLS_BETWEEN_NEXTS.getMetric().getValue() > 0);
+    if (HbaseCompatCapabilities.BRANCH_2) {
+      // Until HBASE-29834 is fixed
+      assertTrue(GLOBAL_HBASE_COUNT_MILLS_BETWEEN_NEXTS.getMetric().getValue() > 0);
+    }
     assertTrue(GLOBAL_HBASE_COUNT_BYTES_REGION_SERVER_RESULTS.getMetric().getValue() > 0);
     assertTrue(GLOBAL_HBASE_COUNT_SCANNED_REGIONS.getMetric().getValue() > 0);
 
@@ -274,7 +278,10 @@ public class PhoenixMetricsIT extends BasePhoenixMetricsIT {
     assertEquals(0, GLOBAL_MUTATION_INDEX_COMMIT_FAILURE_COUNT.getMetric().getValue());
 
     assertTrue(GLOBAL_HBASE_COUNT_RPC_CALLS.getMetric().getValue() > 0);
-    assertTrue(GLOBAL_HBASE_COUNT_MILLS_BETWEEN_NEXTS.getMetric().getValue() > 0);
+    if (HbaseCompatCapabilities.BRANCH_2) {
+      // Until HBASE-29834 is fixed
+      assertTrue(GLOBAL_HBASE_COUNT_MILLS_BETWEEN_NEXTS.getMetric().getValue() > 0);
+    }
     assertTrue(GLOBAL_HBASE_COUNT_BYTES_REGION_SERVER_RESULTS.getMetric().getValue() > 0);
     assertTrue(GLOBAL_HBASE_COUNT_SCANNED_REGIONS.getMetric().getValue() > 0);
 
